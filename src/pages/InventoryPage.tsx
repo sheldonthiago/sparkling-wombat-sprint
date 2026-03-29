@@ -9,6 +9,7 @@ import { QRCodeGenerator } from '@/components/inventory/QRCodeGenerator';
 import { SoftwareLicenseManager } from '@/components/inventory/SoftwareLicenseManager';
 import { MaintenanceContractManager } from '@/components/inventory/MaintenanceContractManager';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
@@ -177,22 +178,22 @@ export default function InventoryPage() {
 
       {/* Dashboard de estatísticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white p-4 rounded-lg shadow">
+        <Card className="bg-white p-4 rounded-lg shadow">
           <h3 className="text-sm font-medium text-gray-500">Total de Itens</h3>
           <p className="text-2xl font-bold">{stats.totalItems}</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow">
+        </Card>
+        <Card className="bg-white p-4 rounded-lg shadow">
           <h3 className="text-sm font-medium text-gray-500">Valor Total</h3>
           <p className="text-2xl font-bold">R$ {stats.totalValue.toFixed(2)}</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow">
+        </Card>
+        <Card className="bg-white p-4 rounded-lg shadow">
           <h3 className="text-sm font-medium text-gray-500">Itens Alocados</h3>
           <p className="text-2xl font-bold">{stats.allocatedItems}</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow">
+        </Card>
+        <Card className="bg-white p-4 rounded-lg shadow">
           <h3 className="text-sm font-medium text-gray-500">Em Manutenção</h3>
           <p className="text-2xl font-bold">{stats.maintenanceItems}</p>
-        </div>
+        </Card>
       </div>
 
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-4">
