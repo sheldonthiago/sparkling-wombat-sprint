@@ -210,6 +210,7 @@ export function ReportsTab({ items, supplies, movements }: ReportsTabProps) {
   };
 
   const getStatusOptions = () => [
+    { value: 'all', label: 'Todos' },
     { value: 'available', label: 'Disponível' },
     { value: 'allocated', label: 'Alocado' },
     { value: 'maintenance', label: 'Em Manutenção' },
@@ -223,6 +224,7 @@ export function ReportsTab({ items, supplies, movements }: ReportsTabProps) {
   ];
 
   const getCategoryOptions = () => [
+    { value: 'all', label: 'Todas' },
     'Notebooks',
     'Desktops',
     'Servidores',
@@ -278,7 +280,6 @@ export function ReportsTab({ items, supplies, movements }: ReportsTabProps) {
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Todos</SelectItem>
               {getStatusOptions().map(option => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
@@ -292,12 +293,21 @@ export function ReportsTab({ items, supplies, movements }: ReportsTabProps) {
                 <SelectValue placeholder="Categoria" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todas</SelectItem>
-                {getCategoryOptions().map(category => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
+                {getCategoryOptions().map(option => {
+                  if (typeof option === 'string') {
+                    return (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    );
+                  } else {
+                    return (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    );
+                  }
+                })}
               </SelectContent>
             </Select>
           )}
