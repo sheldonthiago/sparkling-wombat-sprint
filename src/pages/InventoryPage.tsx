@@ -15,8 +15,6 @@ import { MovementManager } from '@/components/inventory/MovementManager';
 import { NotificationSystem } from '@/components/NotificationSystem';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Package, Key, FileText, QrCode, AlertTriangle, Printer, Wrench, History, ArrowRightLeft } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
@@ -53,7 +51,6 @@ export default function InventoryPage() {
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
-  const [selectedTab, setSelectedTab] = useState('inventory');
   const [selectedItemForMaintenance, setSelectedItemForMaintenance] = useState<InventoryItem | null>(null);
 
   const handleAddItem = async (data: any) => {
@@ -263,141 +260,142 @@ export default function InventoryPage() {
         </div>
       )}
 
-      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-7">
-          <TabsTrigger value="inventory" className="flex items-center gap-2">
-            <Package className="h-4 w-4" />
-            Ativos
-          </TabsTrigger>
-          <TabsTrigger value="maintenance" className="flex items-center gap-2">
-            <Wrench className="h-4 w-4" />
-            Manutenções
-          </TabsTrigger>
-          <TabsTrigger value="movements" className="flex items-center gap-2">
-            <ArrowRightLeft className="h-4 w-4" />
-            Movimentações
-          </TabsTrigger>
-          <TabsTrigger value="licenses" className="flex items-center gap-2">
-            <Key className="h-4 w-4" />
-            Licenças
-          </TabsTrigger>
-          <TabsTrigger value="contracts" className="flex items-center gap-2">
-            <FileText className="h-4 w-4" />
-            Contratos
-          </TabsTrigger>
-          <TabsTrigger value="supplies" className="flex items-center gap-2">
-            <Printer className="h-4 w-4" />
-            Suprimentos
-          </TabsTrigger>
-          <TabsTrigger value="tools" className="flex items-center gap-2">
-            <QrCode className="h-4 w-4" />
-            Ferramentas
-          </TabsTrigger>
-        </TabsList>
+      {/* Seção de Ativos */}
+      <section className="mb-12">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold flex items-center gap-2">
+            <Package className="h-5 w-5" />
+            Gerenciamento de Ativos
+          </h2>
+          <Button onClick={() => setShowAddForm(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Adicionar Ativo
+          </Button>
+        </div>
 
-        <TabsContent value="inventory" className="space-y-4">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Gerenciamento de Ativos</h2>
-            <Button onClick={() => setShowAddForm(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Adicionar Ativo
-            </Button>
-          </div>
+        <InventoryList
+          items={items}
+          onEdit={(item) => {
+            setEditingItem(item);
+            setShowAddForm(true);
+          }}
+          onDelete={handleDeleteItem}
+          onAllocate={handleAllocateItem}
+          onReturn={handleReturnItem}
+          onMaintenance={handleMaintenance}
+        />
+      </section>
 
-          <InventoryList
-            items={items}
-            onEdit={(item) => {
-              setEditingItem(item);
-              setShowAddForm(true);
-            }}
-            onDelete={handleDeleteItem}
-            onAllocate={handleAllocateItem}
-            onReturn={handleReturnItem}
-            onMaintenance={handleMaintenance}
+      {/* Seção de Manutenções */}
+      <section className="mb-12">
+        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <Wrench className="h-5 w-5" />
+          Ordens de Serviço
+        </h2>
+        <MaintenanceManager
+          maintenances={maintenances}
+          items={items}
+          onAddMaintenance={addMaintenance}
+          onUpdateMaintenance={updateMaintenance}
+        />
+      </section>
+
+      {/* Seção de Movimentações */}
+      <section className="mb-12">
+        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <ArrowRightLeft className="h-5 w-5" />
+          Movimentações de Ativos
+        </h2>
+        <MovementManager
+          movements={movements}
+          items={items}
+          onAddMovement={addMovement}
+        />
+      </section>
+
+      {/* Seção de Licenças */}
+      <section className="mb-12">
+        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <Key className="h-5 w-5" />
+          Licenças de Software
+        </h2>
+        <SoftwareLicenseManager
+          licenses={softwareLicenses}
+          onAddLicense={addSoftwareLicense}
+          onUpdateLicense={updateSoftwareLicense}
+        />
+      </section>
+
+      {/* Seção de Contratos */}
+      <section className="mb-12">
+        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <FileText className="h-5 w-5" />
+          Contratos de Manutenção
+        </h2>
+        <MaintenanceContractManager
+          contracts={maintenanceContracts}
+          onAddContract={addMaintenanceContract}
+          onUpdateContract={updateMaintenanceContract}
+        />
+      </section>
+
+      {/* Seção de Suprimentos */}
+      <section className="mb-12">
+        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <Printer className="h-5 w-5" />
+          Suprimentos de Impressora
+        </h2>
+        <PrinterSupplyManager
+          supplies={printerSupplies}
+          onAddSupply={addPrinterSupply}
+          onUpdateSupply={updatePrinterSupply}
+          onRemoveSupply={removePrinterSupply}
+        />
+      </section>
+
+      {/* Seção de Ferramentas */}
+      <section className="mb-12">
+        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <QrCode className="h-5 w-5" />
+          Ferramentas
+        </h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <QRCodeGenerator
+            itemId="SAMPLE-001"
+            itemName="Exemplo de Ativo"
           />
-        </TabsContent>
-
-        <TabsContent value="maintenance" className="space-y-4">
-          <MaintenanceManager
-            maintenances={maintenances}
-            items={items}
-            onAddMaintenance={addMaintenance}
-            onUpdateMaintenance={updateMaintenance}
-          />
-        </TabsContent>
-
-        <TabsContent value="movements" className="space-y-4">
-          <MovementManager
-            movements={movements}
-            items={items}
-            onAddMovement={addMovement}
-          />
-        </TabsContent>
-
-        <TabsContent value="licenses" className="space-y-4">
-          <SoftwareLicenseManager
-            licenses={softwareLicenses}
-            onAddLicense={addSoftwareLicense}
-            onUpdateLicense={updateSoftwareLicense}
-          />
-        </TabsContent>
-
-        <TabsContent value="contracts" className="space-y-4">
-          <MaintenanceContractManager
-            contracts={maintenanceContracts}
-            onAddContract={addMaintenanceContract}
-            onUpdateContract={updateMaintenanceContract}
-          />
-        </TabsContent>
-
-        <TabsContent value="supplies" className="space-y-4">
-          <PrinterSupplyManager
-            supplies={printerSupplies}
-            onAddSupply={addPrinterSupply}
-            onUpdateSupply={updatePrinterSupply}
-            onRemoveSupply={removePrinterSupply}
-          />
-        </TabsContent>
-
-        <TabsContent value="tools" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <QRCodeGenerator
-              itemId="SAMPLE-001"
-              itemName="Exemplo de Ativo"
-            />
-            <Card>
-              <CardHeader>
-                <CardTitle>Ferramentas de Ativos</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <h4 className="font-medium mb-2">Próximas Funcionalidades</h4>
-                  <ul className="text-sm text-gray-600 space-y-1">
-                    <li>• Importação/exportação de dados</li>
-                    <li>• Relatórios personalizados</li>
-                    <li>• Integração com helpdesk</li>
-                    <li>• Controle de multilocation</li>
-                    <li>• Auditoria de alterações</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="font-medium mb-2">Status do Sistema</h4>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm">Banco de Dados:</span>
-                      <Badge variant="outline">{stats.totalItems > 0 ? 'Conectado' : 'Desconectado'}</Badge>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Última Atualização:</span>
-                      <span className="text-sm">{new Date().toLocaleString()}</span>
-                    </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Ferramentas de Ativos</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <h4 className="font-medium mb-2">Próximas Funcionalidades</h4>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li>• Importação/exportação de dados</li>
+                  <li>• Relatórios personalizados</li>
+                  <li>• Integração com helpdesk</li>
+                  <li>• Controle de multilocation</li>
+                  <li>• Auditoria de alterações</li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-medium mb-2">Status do Sistema</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-sm">Banco de Dados:</span>
+                    <Badge variant="outline">{stats.totalItems > 0 ? 'Conectado' : 'Desconectado'}</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm">Última Atualização:</span>
+                    <span className="text-sm">{new Date().toLocaleString()}</span>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-      </Tabs>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
 
       {/* Dialog para adicionar/editar ativo */}
       <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
