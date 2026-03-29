@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useSupabaseInventory } from "@/hooks/use-supabase-inventory";
 import { NotificationSystem } from "@/components/NotificationSystem";
+import { useState, useEffect } from "react"; // Adicionando as importações faltantes
 
 const Index = () => {
   const navigate = useNavigate();
