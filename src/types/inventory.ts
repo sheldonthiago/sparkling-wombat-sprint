@@ -1,104 +1,3 @@
-export interface InventoryItem {
-  id: string;
-  name: string;
-  category: string;
-  type: 'hardware' | 'software' | 'peripheral' | 'component' | 'supply' | 'printer-supply';
-  manufacturer: string;
-  model: string;
-  specifications: string;
-  serialNumber: string;
-  acquisitionDate: Date;
-  warrantyExpiry: Date | null;
-  location: string;
-  status: 'available' | 'allocated' | 'maintenance' | 'discarded';
-  supplier: string;
-  invoiceNumber: string;
-  value: number;
-  assignedTo?: string; // Nome do responsável
-  assignedEmail?: string; // Email do responsável
-  assignedPhone?: string; // Telefone do responsável
-  assignedMatricula?: string; // Matrícula do responsável
-  assignedDate?: Date;
-  notes: string;
-  lastUpdated: Date;
-}
-
-export interface PrinterSupply {
-  id: string;
-  name: string;
-  type: 'toner' | 'ink' | 'drum' | 'ribbon' | 'paper' | 'maintenance-kit';
-  printerModel: string; // Modelo da impressora que usa este suprimento
-  printerBrand: string; // Marca da impressora
-  quantity: number;
-  minStock: number; // Estoque mínimo
-  unit: string; // unidade, caixa, etc.
-  costPerUnit: number;
-  location: string;
-  supplier: string;
-  lastPurchaseDate: Date | null;
-  nextPurchaseDate: Date | null;
-  notes: string;
-}
-
-export interface PrinterSupplyUsage {
-  id: string;
-  supplyId: string;
-  printerId: string;
-  quantityUsed: number;
-  date: Date;
-  user: string;
-  reason: string;
-  pagesPrinted?: number; // Para impressoras
-}
-
-export interface InventoryMovement {
-  id: string;
-  itemId: string;
-  type: 'entry' | 'exit' | 'loan' | 'return' | 'maintenance' | 'discard';
-  quantity: number;
-  reason: string;
-  date: Date;
-  user: string;
-  recipient?: string; // Para empréstimos
-  returnDate?: Date; // Para empréstimos
-}
-
-export interface InventoryStats {
-  totalItems: number;
-  totalValue: number;
-  lowStockItems: number;
-  outOfStockItems: number;
-  itemsNearWarrantyExpiry: number;
-  allocatedItems: number;
-  maintenanceItems: number;
-}
-
-export interface SoftwareLicense {
-  id: string;
-  name: string;
-  version: string;
-  key: string;
-  quantity: number;
-  usedQuantity: number;
-  expiryDate: Date | null;
-  assignedTo: string[]; // IDs dos itens onde está instalado
-  supplier: string;
-  value: number;
-  notes: string;
-}
-
-export interface MaintenanceContract {
-  id: string;
-  equipmentId: string;
-  provider: string;
-  startDate: Date;
-  endDate: Date;
-  serviceLevel: string;
-  cost: number;
-  status: 'active' | 'expired' | 'cancelled';
-  notes: string;
-}
-
 export interface Maintenance {
   id: string;
   itemId: string;
@@ -113,6 +12,7 @@ export interface Maintenance {
   responsibleEmail?: string;
   responsiblePhone?: string;
   responsibleMatricula?: string;
+  serviceOrder?: string; // Novo campo de ordem de serviço
   cost: number;
   notes: string;
   createdBy: string;

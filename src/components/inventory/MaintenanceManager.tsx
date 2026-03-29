@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, Wrench, Calendar, DollarSign, User, AlertTriangle } from 'lucide-react';
+import { Plus, Wrench, Calendar, DollarSign, User, AlertTriangle, Hash } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 
 interface MaintenanceManagerProps {
@@ -30,6 +30,7 @@ export function MaintenanceManager({ maintenances, items, onAddMaintenance, onUp
     type: 'preventive' as 'preventive' | 'corrective',
     status: 'scheduled' as 'scheduled' | 'in_progress' | 'completed' | 'cancelled',
     priority: 'medium' as 'low' | 'medium' | 'high' | 'critical',
+    serviceOrder: '', // Novo campo de ordem de serviço
     startDate: '',
     endDate: '',
     responsible: '',
@@ -48,6 +49,7 @@ export function MaintenanceManager({ maintenances, items, onAddMaintenance, onUp
       type: 'preventive',
       status: 'scheduled',
       priority: 'medium',
+      serviceOrder: '',
       startDate: '',
       endDate: '',
       responsible: '',
@@ -155,6 +157,14 @@ export function MaintenanceManager({ maintenances, items, onAddMaintenance, onUp
                     value={formData.title}
                     onChange={(e) => setFormData({...formData, title: e.target.value})}
                     placeholder="Ex: Troca de memória RAM"
+                  />
+                </div>
+                <div>
+                  <Label>Ordem de Serviço</Label>
+                  <Input 
+                    value={formData.serviceOrder}
+                    onChange={(e) => setFormData({...formData, serviceOrder: e.target.value})}
+                    placeholder="Ex: OS-2024-001"
                   />
                 </div>
                 <div>
@@ -354,6 +364,17 @@ export function MaintenanceManager({ maintenances, items, onAddMaintenance, onUp
                       <p className="font-medium">{maintenance.createdBy}</p>
                     </div>
                   </div>
+
+                  {/* Campo de ordem de serviço */}
+                  {maintenance.serviceOrder && (
+                    <div className="mb-4">
+                      <p className="text-sm text-gray-500">Ordem de Serviço</p>
+                      <p className="font-medium flex items-center gap-1">
+                        <Hash className="h-4 w-4 text-gray-400" />
+                        {maintenance.serviceOrder}
+                      </p>
+                    </div>
+                  )}
                   
                   {/* Informações do responsável */}
                   {maintenance.responsible && (
@@ -425,6 +446,7 @@ export function MaintenanceManager({ maintenances, items, onAddMaintenance, onUp
                           type: maintenance.type,
                           status: maintenance.status,
                           priority: maintenance.priority,
+                          serviceOrder: maintenance.serviceOrder || '',
                           startDate: maintenance.startDate.toISOString().slice(0, 16),
                           endDate: maintenance.endDate?.toISOString().slice(0, 16) || '',
                           responsible: maintenance.responsible,

@@ -112,7 +112,7 @@ export function useSupabaseInventory() {
             user: movement.user,
             recipient: movement.recipient,
             returnDate: movement.return_date ? new Date(movement.return_date) : undefined,
-            sector: movement.sector || '', // Adicionado campo de setor
+            sector: movement.sector || '',
           });
           
           const convertSoftwareLicense = (license: any) => ({
@@ -155,6 +155,7 @@ export function useSupabaseInventory() {
             responsibleEmail: maintenance.responsible_email,
             responsiblePhone: maintenance.responsible_phone,
             responsibleMatricula: maintenance.responsible_matricula,
+            serviceOrder: maintenance.service_order, // Novo campo
             cost: maintenance.cost,
             notes: maintenance.notes,
             createdBy: maintenance.created_by,
@@ -290,7 +291,7 @@ export function useSupabaseInventory() {
       reason: 'Cadastro inicial',
       date: new Date(),
       user: 'Sistema',
-      sector: 'TI' // Setor padrão
+      sector: 'TI'
     });
   };
 
@@ -359,7 +360,7 @@ export function useSupabaseInventory() {
         date: new Date(),
         user: 'Sistema',
         recipient,
-        sector: 'TI' // Setor padrão
+        sector: 'TI'
       });
     }
   };
@@ -380,7 +381,7 @@ export function useSupabaseInventory() {
         reason: 'Devolução',
         date: new Date(),
         user: 'Sistema',
-        sector: 'TI' // Setor padrão
+        sector: 'TI'
       });
     }
   };
@@ -450,21 +451,20 @@ export function useSupabaseInventory() {
         const newQuantity = supply.quantity - quantity;
         return {
           ...supply,
-          quantity: Math.max(0, newQuantity) // Garante que não fique negativo
+          quantity: Math.max(0, newQuantity)
         };
       }
       return supply;
     }));
 
-    // Registrar movimento de saída
     addMovement({
-      itemId: 'SUPPLY-' + id, // Usar ID do suprimento
+      itemId: 'SUPPLY-' + id,
       type: 'exit',
       quantity,
       reason: `Saída de suprimento: ${reason}`,
       date: new Date(),
       user: 'Sistema',
-      sector: sector || 'TI' // Usar setor informado ou padrão
+      sector: sector || 'TI'
     });
   };
 
@@ -518,7 +518,7 @@ export function useSupabaseInventory() {
     updateMaintenance,
     addPrinterSupply,
     updatePrinterSupply,
-    removePrinterSupply, // Nova função exportada
+    removePrinterSupply,
     getItemsByStatus,
     getItemsNearWarrantyExpiry,
     getMaintenancesByItem,
