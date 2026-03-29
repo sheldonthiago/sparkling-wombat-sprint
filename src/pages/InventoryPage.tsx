@@ -17,8 +17,103 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Plus, Package, Key, FileText, QrCode, AlertTriangle, Printer, Wrench, History, ArrowRightLeft } from 'lucide-react';
-import { showSuccess, showError } from '@/utils/toast';
+import { 
+  Plus, 
+  Package, 
+  Key, 
+  FileText, 
+  QrCode, 
+  AlertTriangle, 
+  Printer, 
+  Wrench, 
+  History, 
+  ArrowRightLeft,
+  Search,
+  Filter,
+  Download,
+  Upload,
+  BarChart3,
+  Activity,
+  Cpu,
+  HardDrive,
+  Network,
+  Zap,
+  ChevronRight,
+  Bell,
+  Settings,
+  User,
+  LogOut,
+  Menu,
+  X,
+  Sun,
+  Moon,
+  LayoutDashboard,
+  Shield,
+  Cloud,
+  Database,
+  Radar,
+  Satellite,
+  Orbit,
+  Atom,
+  Flux,
+  Hexagon,
+  Triangle,
+  Circle,
+  Square,
+  Pentagon,
+  Octagon,
+  Video,
+  Headphones,
+  Monitor,
+  Keyboard,
+  Mouse,
+  Cables,
+  Power,
+  Signal,
+  Wifi,
+  Globe,
+  Rocket,
+  Smartphone,
+  Tablet,
+  Watch,
+  Camera,
+  Scanners,
+  Server,
+  HardDriveDownload,
+  HardDriveUpload,
+  Router,
+  Switch,
+  WifiOff,
+  Bluetooth,
+  Usb,
+  Hdmi,
+  Vga,
+  Display,
+  Speaker,
+  Mic,
+  Gamepad,
+  Joystick,
+  Tv,
+  Radio,
+  Battery,
+  BatteryCharging,
+  BatteryLow,
+  BatteryFull,
+  BatteryMedium,
+  BatteryWarning,
+  Lightning,
+  CloudLightning,
+  CloudRain,
+  CloudSnow,
+  CloudSun,
+  CloudMoon,
+  Wind,
+  Droplets,
+  Thermometer,
+  Compass,
+  Map,
+  Navigation
+} from "lucide-react";
 
 export default function InventoryPage() {
   const {
@@ -53,6 +148,9 @@ export default function InventoryPage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const [selectedItemForMaintenance, setSelectedItemForMaintenance] = useState<InventoryItem | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeSection, setActiveSection] = useState('dashboard');
 
   const handleAddItem = async (data: any) => {
     try {
@@ -137,272 +235,450 @@ export default function InventoryPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="flex justify-center items-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Carregando dados...</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%239C92AC\' fill-opacity=\'0.05\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]"></div>
+        <div className="text-center z-10">
+          <div className="relative w-20 h-20 mx-auto mb-6">
+            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 animate-pulse"></div>
+            <div className="absolute inset-1 rounded-full bg-slate-900 flex items-center justify-center">
+              <Cpu className="h-8 w-8 text-blue-400 animate-pulse" />
+            </div>
+          </div>
+          <p className="text-blue-300 text-lg font-medium tracking-wider">CARREGANDO DADOS</p>
+          <div className="mt-4 flex justify-center gap-1">
+            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+            <div className="w-2 h-2 bg-cyan-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
           </div>
         </div>
       </div>
     );
   }
 
+  const navItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+    { id: 'assets', label: 'Ativos', icon: Package },
+    { id: 'maintenance', label: 'Manutenções', icon: Wrench },
+    { id: 'movements', label: 'Movimentações', icon: ArrowRightLeft },
+    { id: 'licenses', label: 'Licenças', icon: Key },
+    { id: 'contracts', label: 'Contratos', icon: FileText },
+    { id: 'supplies', label: 'Suprimentos', icon: Printer },
+  ];
+
   return (
-    <div className="container mx-auto p-6 relative">
-      <NotificationSystem
-        items={items}
-        supplies={printerSupplies}
-        movements={movements}
-        maintenances={maintenances}
-      />
-
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">Sistema de Ativos de TI</h1>
-        <p className="text-gray-600">Gerencie seu inventário de materiais de informática</p>
-      </div>
-
-      {/* Alertas de expiração e estoque */}
-      {(itemsNearWarrantyExpiry.length > 0 || itemsExpiringSoon.length > 0 || contractsExpiringSoon.length > 0 || lowStockSupplies.length > 0 || outOfStockSupplies.length > 0 || maintenances.filter(m => m.status === 'in_progress').length > 0 || delayedLoans.length > 0) && (
-        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <AlertTriangle className="h-5 w-5 text-yellow-600" />
-            <h3 className="font-semibold text-yellow-800">Alertas e Notificações</h3>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            {itemsNearWarrantyExpiry.length > 0 && (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex">
+      {/* Sidebar */}
+      <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-slate-900/50 backdrop-blur-xl border-r border-slate-700/50 transition-all duration-300 flex flex-col`}>
+        <div className="p-6 border-b border-slate-700/50">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0">
+              <Cpu className="h-5 w-5 text-white" />
+            </div>
+            {sidebarOpen && (
               <div>
-                <p className="text-yellow-700">
-                  {itemsNearWarrantyExpiry.length} ativo(s) com garantia próxima do vencimento
-                </p>
-              </div>
-            )}
-            {itemsExpiringSoon.length > 0 && (
-              <div>
-                <p className="text-yellow-700">
-                  {itemsExpiringSoon.length} licença(s) de software expirando em breve
-                </p>
-              </div>
-            )}
-            {contractsExpiringSoon.length > 0 && (
-              <div>
-                <p className="text-yellow-700">
-                  {contractsExpiringSoon.length} contrato(s) de manutenção expirando em breve
-                </p>
-              </div>
-            )}
-            {outOfStockSupplies.length > 0 && (
-              <div>
-                <p className="text-red-700">
-                  {outOfStockSupplies.length} suprimento(s) de impressora esgotado(s)
-                </p>
-              </div>
-            )}
-            {lowStockSupplies.length > 0 && outOfStockSupplies.length === 0 && (
-              <div>
-                <p className="text-yellow-700">
-                  {lowStockSupplies.length} suprimento(s) de impressora com estoque baixo
-                </p>
-              </div>
-            )}
-            {maintenances.filter(m => m.status === 'in_progress').length > 0 && (
-              <div>
-                <p className="text-blue-700">
-                  {maintenances.filter(m => m.status === 'in_progress').length} manutenção(ões) em andamento
-                </p>
-              </div>
-            )}
-            {delayedLoans.length > 0 && (
-              <div>
-                <p className="text-red-700">
-                  {delayedLoans.length} empréstimo(s) atrasado(s)
-                </p>
+                <h1 className="text-xl font-bold text-white">TechAsset</h1>
+                <p className="text-xs text-slate-400">Gestão de Ativos</p>
               </div>
             )}
           </div>
         </div>
-      )}
 
-      {/* Dashboard de estatísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <Card className="bg-white p-4 rounded-lg shadow">
-          <h3 className="text-sm font-medium text-gray-500">Total de Ativos</h3>
-          <p className="text-2xl font-bold">{stats.totalItems}</p>
-        </Card>
-        <Card className="bg-white p-4 rounded-lg shadow">
-          <h3 className="text-sm font-medium text-gray-500">Valor Total</h3>
-          <p className="text-2xl font-bold">R$ {stats.totalValue.toFixed(2)}</p>
-        </Card>
-        <Card className="bg-white p-4 rounded-lg shadow">
-          <h3 className="text-sm font-medium text-gray-500">Ativos Alocados</h3>
-          <p className="text-2xl font-bold">{stats.allocatedItems}</p>
-        </Card>
-        <Card className="bg-white p-4 rounded-lg shadow">
-          <h3 className="text-sm font-medium text-gray-500">Em Manutenção</h3>
-          <p className="text-2xl font-bold">{stats.maintenanceItems}</p>
-        </Card>
+        <nav className="flex-1 p-4 space-y-2">
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveSection(item.id)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                activeSection === item.id 
+                  ? 'bg-gradient-to-r from-blue-600/20 to-cyan-600/20 text-blue-400 border border-blue-500/30' 
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+              }`}
+            >
+              <item.icon className="h-5 w-5 flex-shrink-0" />
+              {sidebarOpen && <span className="font-medium">{item.label}</span>}
+            </button>
+          ))}
+        </nav>
+
+        <div className="p-4 border-t border-slate-700/50">
+          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all">
+            <Settings className="h-5 w-5" />
+            {sidebarOpen && <span className="font-medium">Configurações</span>}
+          </button>
+        </div>
       </div>
 
-      {/* Estatísticas de suprimentos */}
-      {printerSupplies.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <Card className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-sm font-medium text-gray-500">Suprimentos Totais</h3>
-            <p className="text-2xl font-bold">{printerSupplies.length}</p>
-          </Card>
-          <Card className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-sm font-medium text-gray-500">Estoque Baixo</h3>
-            <p className="text-2xl font-bold text-yellow-600">{lowStockSupplies.length}</p>
-          </Card>
-          <Card className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-sm font-medium text-gray-500">Esgotados</h3>
-            <p className="text-2xl font-bold text-red-600">{outOfStockSupplies.length}</p>
-          </Card>
-        </div>
-      )}
-
-      {/* Seção de Ativos */}
-      <section className="mb-12">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold flex items-center gap-2">
-            <Package className="h-5 w-5" />
-            Gerenciamento de Ativos
-          </h2>
-          <Button onClick={() => setShowAddForm(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Adicionar Ativo
-          </Button>
-        </div>
-
-        <InventoryList
-          items={items}
-          onEdit={(item) => {
-            setEditingItem(item);
-            setShowAddForm(true);
-          }}
-          onDelete={handleDeleteItem}
-          onAllocate={handleAllocateItem}
-          onReturn={handleReturnItem}
-          onMaintenance={handleMaintenance}
-        />
-      </section>
-
-      {/* Seção de Manutenções */}
-      <section className="mb-12">
-        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-          <Wrench className="h-5 w-5" />
-          Ordens de Serviço
-        </h2>
-        <MaintenanceManager
-          maintenances={maintenances}
-          items={items}
-          onAddMaintenance={addMaintenance}
-          onUpdateMaintenance={updateMaintenance}
-        />
-      </section>
-
-      {/* Seção de Movimentações */}
-      <section className="mb-12">
-        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-          <ArrowRightLeft className="h-5 w-5" />
-          Movimentações de Ativos
-        </h2>
-        <MovementManager
-          movements={movements}
-          items={items}
-          onAddMovement={addMovement}
-        />
-      </section>
-
-      {/* Seção de Licenças */}
-      <section className="mb-12">
-        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-          <Key className="h-5 w-5" />
-          Licenças de Software
-        </h2>
-        <SoftwareLicenseManager
-          licenses={softwareLicenses}
-          onAddLicense={addSoftwareLicense}
-          onUpdateLicense={updateSoftwareLicense}
-        />
-      </section>
-
-      {/* Seção de Contratos */}
-      <section className="mb-12">
-        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-          <FileText className="h-5 w-5" />
-          Contratos de Manutenção
-        </h2>
-        <MaintenanceContractManager
-          contracts={maintenanceContracts}
-          onAddContract={addMaintenanceContract}
-          onUpdateContract={updateMaintenanceContract}
-        />
-      </section>
-
-      {/* Seção de Suprimentos */}
-      <section className="mb-12">
-        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-          <Printer className="h-5 w-5" />
-          Suprimentos de Impressora
-        </h2>
-        <PrinterSupplyManager
-          supplies={printerSupplies}
-          onAddSupply={addPrinterSupply}
-          onUpdateSupply={updatePrinterSupply}
-          onRemoveSupply={removePrinterSupply}
-        />
-      </section>
-
-      {/* Seção de Ferramentas */}
-      <section className="mb-12">
-        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-          <QrCode className="h-5 w-5" />
-          Ferramentas
-        </h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <QRCodeGenerator
-            itemId="SAMPLE-001"
-            itemName="Exemplo de Ativo"
-          />
-          <Card>
-            <CardHeader>
-              <CardTitle>Ferramentas de Ativos</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h4 className="font-medium mb-2">Próximas Funcionalidades</h4>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• Importação/exportação de dados</li>
-                  <li>• Relatórios personalizados</li>
-                  <li>• Integração com helpdesk</li>
-                  <li>• Controle de multilocation</li>
-                  <li>• Auditoria de alterações</li>
-                </ul>
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <header className="bg-slate-900/30 backdrop-blur-xl border-b border-slate-700/50 p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="text-slate-400 hover:text-white"
+              >
+                {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </Button>
+              
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Buscar ativos, licenças, suprimentos..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 pr-4 py-2 w-64 bg-slate-800/50 border border-slate-700/50 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent"
+                />
               </div>
-              <div>
-                <h4 className="font-medium mb-2">Status do Sistema</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm">Banco de Dados:</span>
-                    <Badge variant="outline">{stats.totalItems > 0 ? 'Conectado' : 'Desconectado'}</Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm">Última Atualização:</span>
-                    <span className="text-sm">{new Date().toLocaleString()}</span>
-                  </div>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white relative">
+                <Bell className="h-5 w-5" />
+                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              </Button>
+              
+              <div className="flex items-center gap-3 px-3 py-2 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+                  <User className="h-4 w-4 text-white" />
+                </div>
+                <div className="hidden md:block">
+                  <p className="text-sm font-medium text-white">Admin</p>
+                  <p className="text-xs text-slate-400">TI</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+            </div>
+          </div>
+        </header>
 
-      {/* Dialog para adicionar/editar ativo */}
+        {/* Main Content Area */}
+        <main className="flex-1 p-8 overflow-auto">
+          <NotificationSystem
+            items={items}
+            supplies={printerSupplies}
+            movements={movements}
+            maintenances={maintenances}
+          />
+
+          {/* Dashboard Section */}
+          {activeSection === 'dashboard' && (
+            <div className="space-y-8">
+              <div>
+                <h1 className="text-3xl font-bold text-white mb-2">Dashboard</h1>
+                <p className="text-slate-400">Visão geral do sistema de ativos</p>
+              </div>
+
+              {/* Alertas */}
+              {(itemsNearWarrantyExpiry.length > 0 || itemsExpiringSoon.length > 0 || contractsExpiringSoon.length > 0 || lowStockSupplies.length > 0 || outOfStockSupplies.length > 0 || maintenances.filter(m => m.status === 'in_progress').length > 0 || delayedLoans.length > 0) && (
+                <div className="p-6 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-2xl backdrop-blur-sm">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 bg-amber-500/20 rounded-lg">
+                      <AlertTriangle className="h-5 w-5 text-amber-400" />
+                    </div>
+                    <h3 className="font-semibold text-amber-400">Alertas e Notificações</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    {itemsNearWarrantyExpiry.length > 0 && (
+                      <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
+                        <p className="text-amber-300 font-medium">
+                          {itemsNearWarrantyExpiry.length} ativo(s) com garantia próxima do vencimento
+                        </p>
+                      </div>
+                    )}
+                    {itemsExpiringSoon.length > 0 && (
+                      <div className="p-3 bg-red-500/10 rounded-lg border border-red-500/20">
+                        <p className="text-red-300 font-medium">
+                          {itemsExpiringSoon.length} licença(s) de software expirando em breve
+                        </p>
+                      </div>
+                    )}
+                    {outOfStockSupplies.length > 0 && (
+                      <div className="p-3 bg-red-500/10 rounded-lg border border-red-500/20">
+                        <p className="text-red-300 font-medium">
+                          {outOfStockSupplies.length} suprimento(s) de impressora esgotado(s)
+                        </p>
+                      </div>
+                    )}
+                    {lowStockSupplies.length > 0 && outOfStockSupplies.length === 0 && (
+                      <div className="p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
+                        <p className="text-yellow-300 font-medium">
+                          {lowStockSupplies.length} suprimento(s) com estoque baixo
+                        </p>
+                      </div>
+                    )}
+                    {delayedLoans.length > 0 && (
+                      <div className="p-3 bg-red-500/10 rounded-lg border border-red-500/20">
+                        <p className="text-red-300 font-medium">
+                          {delayedLoans.length} empréstimo(s) atrasado(s)
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Stats Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[
+                  { label: "Total de Ativos", value: stats.totalItems, icon: HardDrive, color: "from-blue-500 to-cyan-500", bg: "from-blue-500/10 to-cyan-500/10" },
+                  { label: "Valor Total", value: `R$ ${stats.totalValue.toFixed(2)}`, icon: Activity, color: "from-green-500 to-emerald-500", bg: "from-green-500/10 to-emerald-500/10" },
+                  { label: "Em Manutenção", value: stats.maintenanceItems, icon: Wrench, color: "from-yellow-500 to-amber-500", bg: "from-yellow-500/10 to-amber-500/10" },
+                  { label: "Alocados", value: stats.allocatedItems, icon: User, color: "from-purple-500 to-pink-500", bg: "from-purple-500/10 to-pink-500/10" }
+                ].map((stat, index) => (
+                  <Card key={index} className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border-slate-700/50 backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 hover:scale-105 group">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className={`p-3 rounded-xl bg-gradient-to-br ${stat.bg} border border-slate-700/50 group-hover:scale-110 transition-transform`}>
+                          <stat.icon className={`h-6 w-6 bg-gradient-to-br ${stat.color} bg-clip-text text-transparent`} />
+                        </div>
+                        <ChevronRight className="h-5 w-5 text-slate-500 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" />
+                      </div>
+                      <p className="text-3xl font-bold text-white mb-2">{stat.value}</p>
+                      <p className="text-sm text-slate-400">{stat.label}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Quick Actions */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <Card className="bg-gradient-to-br from-blue-600/10 to-cyan-600/10 border-blue-500/30 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <Plus className="h-5 w-5 text-blue-400" />
+                      Ações Rápidas
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <Button 
+                      onClick={() => { setActiveSection('assets'); setShowAddForm(true); }}
+                      className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white border-0"
+                    >
+                      <Package className="h-4 w-4 mr-2" />
+                      Adicionar Novo Ativo
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      onClick={() => setActiveSection('maintenance')}
+                      className="w-full border-blue-500/30 text-blue-300 hover:bg-blue-500/10"
+                    >
+                      <Wrench className="h-4 w-4 mr-2" />
+                      Nova Ordem de Serviço
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      onClick={() => setActiveSection('movements')}
+                      className="w-full border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
+                    >
+                      <ArrowRightLeft className="h-4 w-4 mr-2" />
+                      Registrar Movimentação
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-purple-600/10 to-pink-600/10 border-purple-500/30 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <Activity className="h-5 w-5 text-purple-400" />
+                      Status do Sistema
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-400">Banco de Dados</span>
+                      <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                        <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
+                        Conectado
+                      </Badge>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-400">Sincronização</span>
+                      <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+                        <div className="w-2 h-2 bg-blue-400 rounded-full mr-2 animate-pulse"></div>
+                        Ativo
+                      </Badge>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-400">Última Atualização</span>
+                      <span className="text-sm text-slate-300">{new Date().toLocaleTimeString()}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-green-600/10 to-emerald-600/10 border-green-500/30 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <Zap className="h-5 w-5 text-green-400" />
+                      Performance
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <div className="flex justify-between text-sm mb-2">
+                        <span className="text-slate-400">CPU</span>
+                        <span className="text-green-400">23%</span>
+                      </div>
+                      <div className="w-full bg-slate-700/50 rounded-full h-2">
+                        <div className="bg-gradient-to-r from-green-500 to-emerald-500 h-2 rounded-full" style={{ width: '23%' }}></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-sm mb-2">
+                        <span className="text-slate-400">Memória</span>
+                        <span className="text-blue-400">45%</span>
+                      </div>
+                      <div className="w-full bg-slate-700/50 rounded-full h-2">
+                        <div className="bg-gradient-to-r from-blue-500 to-cyan-500 h-2 rounded-full" style={{ width: '45%' }}></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-sm mb-2">
+                        <span className="text-slate-400">Armazenamento</span>
+                        <span className="text-yellow-400">67%</span>
+                      </div>
+                      <div className="w-full bg-slate-700/50 rounded-full h-2">
+                        <div className="bg-gradient-to-r from-yellow-500 to-amber-500 h-2 rounded-full" style={{ width: '67%' }}></div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          )}
+
+          {/* Assets Section */}
+          {activeSection === 'assets' && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h1 className="text-3xl font-bold text-white mb-2">Gerenciamento de Ativos</h1>
+                  <p className="text-slate-400">Controle completo do seu inventário de TI</p>
+                </div>
+                <Button 
+                  onClick={() => setShowAddForm(true)}
+                  className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg shadow-blue-500/25"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Novo Ativo
+                </Button>
+              </div>
+
+              <InventoryList
+                items={items}
+                onEdit={(item) => {
+                  setEditingItem(item);
+                  setShowAddForm(true);
+                }}
+                onDelete={handleDeleteItem}
+                onAllocate={handleAllocateItem}
+                onReturn={handleReturnItem}
+                onMaintenance={handleMaintenance}
+              />
+            </div>
+          )}
+
+          {/* Maintenance Section */}
+          {activeSection === 'maintenance' && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h1 className="text-3xl font-bold text-white mb-2">Ordens de Serviço</h1>
+                  <p className="text-slate-400">Gestão de manutenções e reparos</p>
+                </div>
+              </div>
+
+              <MaintenanceManager
+                maintenances={maintenances}
+                items={items}
+                onAddMaintenance={addMaintenance}
+                onUpdateMaintenance={updateMaintenance}
+              />
+            </div>
+          )}
+
+          {/* Movements Section */}
+          {activeSection === 'movements' && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h1 className="text-3xl font-bold text-white mb-2">Movimentações</h1>
+                  <p className="text-slate-400">Histórico de movimentações de ativos</p>
+                </div>
+              </div>
+
+              <MovementManager
+                movements={movements}
+                items={items}
+                onAddMovement={addMovement}
+              />
+            </div>
+          )}
+
+          {/* Licenses Section */}
+          {activeSection === 'licenses' && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h1 className="text-3xl font-bold text-white mb-2">Licenças de Software</h1>
+                  <p className="text-slate-400">Gestão de licenças e compliance</p>
+                </div>
+              </div>
+
+              <SoftwareLicenseManager
+                licenses={softwareLicenses}
+                onAddLicense={addSoftwareLicense}
+                onUpdateLicense={updateSoftwareLicense}
+              />
+            </div>
+          )}
+
+          {/* Contracts Section */}
+          {activeSection === 'contracts' && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h1 className="text-3xl font-bold text-white mb-2">Contratos de Manutenção</h1>
+                  <p className="text-slate-400">Gestão de contratos e garantias</p>
+                </div>
+              </div>
+
+              <MaintenanceContractManager
+                contracts={maintenanceContracts}
+                onAddContract={addMaintenanceContract}
+                onUpdateContract={updateMaintenanceContract}
+              />
+            </div>
+          )}
+
+          {/* Supplies Section */}
+          {activeSection === 'supplies' && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h1 className="text-3xl font-bold text-white mb-2">Suprimentos de Impressora</h1>
+                  <p className="text-slate-400">Controle de estoque de suprimentos</p>
+                </div>
+              </div>
+
+              <PrinterSupplyManager
+                supplies={printerSupplies}
+                onAddSupply={addPrinterSupply}
+                onUpdateSupply={updatePrinterSupply}
+                onRemoveSupply={removePrinterSupply}
+              />
+            </div>
+          )}
+        </main>
+      </div>
+
+      {/* Dialogs */}
       <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl bg-slate-900 border-slate-700/50 backdrop-blur-xl">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-white">
               {editingItem ? 'Editar Ativo' : 'Adicionar Novo Ativo'}
             </DialogTitle>
           </DialogHeader>
@@ -437,12 +713,11 @@ export default function InventoryPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Dialog para histórico de manutenções */}
       <Dialog open={!!selectedItemForMaintenance} onOpenChange={() => setSelectedItemForMaintenance(null)}>
-        <DialogContent className="max-w-4xl">
+        <DialogContent className="max-w-4xl bg-slate-900 border-slate-700/50 backdrop-blur-xl">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <History className="h-5 w-5" />
+            <DialogTitle className="text-white flex items-center gap-2">
+              <History className="h-5 w-5 text-blue-400" />
               Histórico de Manutenções
             </DialogTitle>
           </DialogHeader>
