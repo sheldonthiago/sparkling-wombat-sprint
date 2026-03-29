@@ -2,7 +2,7 @@ export interface InventoryItem {
   id: string;
   name: string;
   category: string;
-  type: 'hardware' | 'software' | 'peripheral' | 'component' | 'supply';
+  type: 'hardware' | 'software' | 'peripheral' | 'component' | 'supply' | 'printer-supply';
   manufacturer: string;
   model: string;
   specifications: string;
@@ -18,6 +18,34 @@ export interface InventoryItem {
   assignedDate?: Date;
   notes: string;
   lastUpdated: Date;
+}
+
+export interface PrinterSupply {
+  id: string;
+  name: string;
+  type: 'toner' | 'ink' | 'drum' | 'ribbon' | 'paper' | 'maintenance-kit';
+  printerModel: string; // Modelo da impressora que usa este suprimento
+  printerBrand: string; // Marca da impressora
+  quantity: number;
+  minStock: number; // Estoque mínimo
+  unit: string; // unidade, caixa, etc.
+  costPerUnit: number;
+  location: string;
+  supplier: string;
+  lastPurchaseDate: Date | null;
+  nextPurchaseDate: Date | null;
+  notes: string;
+}
+
+export interface PrinterSupplyUsage {
+  id: string;
+  supplyId: string;
+  printerId: string;
+  quantityUsed: number;
+  date: Date;
+  user: string;
+  reason: string;
+  pagesPrinted?: number; // Para impressoras
 }
 
 export interface InventoryMovement {
@@ -79,7 +107,6 @@ export const CATEGORIES = [
   'Access Points',
   'Monitores',
   'Impressoras',
-  'Projetores',
   
   // Software
   'Sistemas Operacionais',
@@ -118,6 +145,15 @@ export const CATEGORIES = [
   'Outros'
 ];
 
+export const PRINTER_SUPPLY_TYPES = [
+  { value: 'toner', label: 'Toner', color: 'bg-blue-100 text-blue-800' },
+  { value: 'ink', label: 'Cartucho de Tinta', color: 'bg-green-100 text-green-800' },
+  { value: 'drum', label: 'Unidade de Impressão', color: 'bg-purple-100 text-purple-800' },
+  { value: 'ribbon', label: 'Fita', color: 'bg-gray-100 text-gray-800' },
+  { value: 'paper', label: 'Papel', color: 'bg-yellow-100 text-yellow-800' },
+  { value: 'maintenance-kit', label: 'Kit de Manutenção', color: 'bg-red-100 text-red-800' }
+];
+
 export const UNITS = [
   'unidade',
   'par',
@@ -126,7 +162,8 @@ export const UNITS = [
   'pacote',
   'metro',
   'litro',
-  'kg'
+  'kg',
+  'requisição'
 ];
 
 export const STATUSES = [

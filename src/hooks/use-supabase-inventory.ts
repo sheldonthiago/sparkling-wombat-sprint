@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { InventoryItem, InventoryMovement, InventoryStats, SoftwareLicense, MaintenanceContract } from '@/types/inventory';
+import { InventoryItem, InventoryMovement, InventoryStats, SoftwareLicense, MaintenanceContract, PrinterSupply } from '@/types/inventory';
 
 export function useSupabaseInventory() {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [movements, setMovements] = useState<InventoryMovement[]>([]);
   const [softwareLicenses, setSoftwareLicenses] = useState<SoftwareLicense[]>([]);
   const [maintenanceContracts, setMaintenanceContracts] = useState<MaintenanceContract[]>([]);
+  const [printerSupplies, setPrinterSupplies] = useState<PrinterSupply[]>([]);
   const [stats, setStats] = useState<InventoryStats>({
     totalItems: 0,
     totalValue: 0,
@@ -120,22 +121,42 @@ export function useSupabaseInventory() {
             status: contract.status,
             notes: contract.notes,
           });
+
+          const convertPrinterSupply = (supply: any) => ({
+            id: supply.id,
+            name: supply.name,
+            type: supply.type,
+            printerModel: supply.printer_model,
+            printerBrand: supply.printer_brand,
+            quantity: supply.quantity,
+            minStock: supply.min_stock,
+            unit: supply.unit,
+            costPerUnit: supply.cost_per_unit,
+            location: supply.location,
+            supplier: supply.supplier,
+            lastPurchaseDate: supply.last_purchase_date ? new Date(supply.last_purchase_date) : null,
+            nextPurchaseDate: supply.next_purchase_date ? new Date(supply.next_purchase_date) : null,
+            notes: supply.notes,
+          });
           
           setItems(itemsData.map(convertItem));
           setMovements(movementsData.map(convertMovement));
           setSoftwareLicenses(softwareData.map(convertSoftwareLicense));
           setMaintenanceContracts(contractsData.map(convertMaintenanceContract));
+          setPrinterSupplies([]); // Implementar quando tiver tabela no Supabase
         } else {
           // Carregar do localStorage
           const savedItems = localStorage.getItem('inventory-data-items');
           const savedMovements = localStorage.getItem('inventory-data-movements');
           const savedSoftware = localStorage.getItem('software-licenses');
           const savedContracts = localStorage.getItem('maintenance-contracts');
+          const savedSupplies = localStorage.getItem('printer-supplies');
           
           if (savedItems) setItems(JSON.parse(savedItems));
           if (savedMovements) setMovements(JSON.parse(savedMovements));
           if (savedSoftware) setSoftwareLicenses(JSON.parse(savedSoftware));
           if (savedContracts) setMaintenanceContracts(JSON.parse(savedContracts));
+          if (savedSupplies) setPrinterSupplies(JSON.parse(savedSupplies));
         }
       } catch (error) {
         console.error('Error loading data:', error);
@@ -144,11 +165,13 @@ export function useSupabaseInventory() {
         const savedMovements = localStorage.getItem('inventory-data-movements');
         const savedSoftware = localStorage.getItem('software-licenses');
         const savedContracts = localStorage.getItem('maintenance-contracts');
+        const savedSupplies = localStorage.getItem('printer-supplies');
         
         if (savedItems) setItems(JSON.parse(savedItems));
         if (savedMovements) setMovements(JSON.parse(savedMovements));
         if (savedSoftware) setSoftwareLicenses(JSON.parse(savedSoftware));
         if (savedContracts) setMaintenanceContracts(JSON.parse(savedContracts));
+        if (savedSupplies) setPrinterSupplies(JSON.parse(savedSupplies));
       } finally {
         setLoading(false);
       }
@@ -170,6 +193,7 @@ export function useSupabaseInventory() {
           localStorage.setItem('inventory-data-movements', JSON.stringify(movements));
           localStorage.setItem('software-licenses', JSON.stringify(softwareLicenses));
           localStorage.setItem('maintenance-contracts', JSON.stringify(maintenanceContracts));
+          localStorage.setItem('printer-supplies', JSON.stringify(printerSupplies));
         }
         calculateStats();
       } catch (error) {
@@ -178,7 +202,7 @@ export function useSupabaseInventory() {
     };
 
     saveData();
-  }, [items, movements, softwareLicenses, maintenanceContracts, useSupabase]);
+  }, [items, movements, softwareLicenses, maintenanceContracts, printerSupplies, useSupabase]);
 
   const calculateStats = () => {
     const totalItems = items.length;
@@ -334,6 +358,20 @@ export function useSupabaseInventory() {
     setMaintenanceContracts(prev => [...prev, newContract]);
   };
 
+  const addPrinterSupply = (supply: Omit<PrinterSupply, 'id'>) => {
+    const newSupply: PrinterSupply = {
+      ...supply,
+      id: Date.now().toString()
+    };
+    setPrinterSupplies(prev => [...prev, newSupply]);
+  };
+
+  const updatePrinterSupply = (id: string, updates: Partial<PrinterSupply>) => {
+    setPrinterSupplies(prev => prev.map(supply => 
+      supply.id === id ? { ...supply, ...updates } : supply
+    ));
+  };
+
   const getItemsByStatus = (status: string) => {
     return items.filter(item => item.status === status);
   };
@@ -346,11 +384,22 @@ export function useSupabaseInventory() {
     );
   };
 
+  const getLowStockSupplies = () => {
+    return printerSupplies.filter(supply => 
+      supply.quantity <= supply.minStock && supply.quantity > 0
+    );
+  };
+
+  const getOutOfStockSupplies = () => {
+    return printerSupplies.filter(supply => supply.quantity === 0);
+  };
+
   return {
     items,
     movements,
     softwareLicenses,
     maintenanceContracts,
+    printerSupplies,
     stats,
     loading,
     useSupabase,
@@ -363,7 +412,11 @@ export function useSupabaseInventory() {
     addSoftwareLicense,
     updateSoftwareLicense,
     addMaintenanceContract,
+    addPrinterSupply,
+    updatePrinterSupply,
     getItemsByStatus,
-    getItemsNearWarrantyExpiry
+    getItemsNearWarrantyExpiry,
+    getLowStockSupplies,
+    getOutOfStockSupplies
   };
 }

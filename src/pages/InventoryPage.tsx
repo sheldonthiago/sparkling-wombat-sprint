@@ -8,12 +8,13 @@ import { InventoryList } from '@/components/inventory/InventoryList';
 import { QRCodeGenerator } from '@/components/inventory/QRCodeGenerator';
 import { SoftwareLicenseManager } from '@/components/inventory/SoftwareLicenseManager';
 import { MaintenanceContractManager } from '@/components/inventory/MaintenanceContractManager';
+import { PrinterSupplyManager } from '@/components/inventory/PrinterSupplyManager';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Package, Key, FileText, QrCode, AlertTriangle } from 'lucide-react';
+import { Plus, Package, Key, FileText, QrCode, AlertTriangle, Printer } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 
 export default function InventoryPage() {
@@ -22,6 +23,7 @@ export default function InventoryPage() {
     stats,
     softwareLicenses,
     maintenanceContracts,
+    printerSupplies,
     addItem,
     updateItem,
     deleteItem,
@@ -32,6 +34,10 @@ export default function InventoryPage() {
     updateSoftwareLicense,
     addMaintenanceContract,
     updateMaintenanceContract,
+    addPrinterSupply,
+    updatePrinterSupply,
+    getLowStockSupplies,
+    getOutOfStockSupplies,
     loading
   } = useSupabaseInventory();
 
@@ -123,6 +129,9 @@ export default function InventoryPage() {
     new Date(contract.endDate).getTime() - new Date().getTime() < 90 * 24 * 60 * 60 * 1000
   );
 
+  const lowStockSupplies = getLowStockSupplies();
+  const outOfStockSupplies = getOutOfStockSupplies();
+
   if (loading) {
     return (
       <div className="container mx-auto p-6">
@@ -143,12 +152,12 @@ export default function InventoryPage() {
         <p className="text-gray-600">Gerencie seu inventário de materiais de informática</p>
       </div>
 
-      {/* Alertas de expiração */}
-      {(itemsNearWarrantyExpiry.length > 0 || itemsExpiringSoon.length > 0 || contractsExpiringSoon.length > 0) && (
+      {/* Alertas de expiração e estoque */}
+      {(itemsNearWarrantyExpiry.length > 0 || itemsExpiringSoon.length > 0 || contractsExpiringSoon.length > 0 || lowStockSupplies.length > 0 || outOfStockSupplies.length > 0) && (
         <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
           <div className="flex items-center gap-2 mb-2">
             <AlertTriangle className="h-5 w-5 text-yellow-600" />
-            <h3 className="font-semibold text-yellow-800">Alertas de Expiração</h3>
+            <h3 className="font-semibold text-yellow-800">Alertas e Notificações</h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             {itemsNearWarrantyExpiry.length > 0 && (
@@ -169,6 +178,20 @@ export default function InventoryPage() {
               <div>
                 <p className="text-yellow-700">
                   {contractsExpiringSoon.length} contrato(s) de manutenção expirando em breve
+                </p>
+              </div>
+            )}
+            {outOfStockSupplies.length > 0 && (
+              <div>
+                <p className="text-red-700">
+                  {outOfStockSupplies.length} suprimento(s) de impressora esgotado(s)
+                </p>
+              </div>
+            )}
+            {lowStockSupplies.length > 0 && outOfStockSupplies.length === 0 && (
+              <div>
+                <p className="text-yellow-700">
+                  {lowStockSupplies.length} suprimento(s) de impressora com estoque baixo
                 </p>
               </div>
             )}
@@ -196,8 +219,26 @@ export default function InventoryPage() {
         </Card>
       </div>
 
+      {/* Estatísticas de suprimentos */}
+      {printerSupplies.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <Card className="bg-white p-4 rounded-lg shadow">
+            <h3 className="text-sm font-medium text-gray-500">Suprimentos Totais</h3>
+            <p className="text-2xl font-bold">{printerSupplies.length}</p>
+          </Card>
+          <Card className="bg-white p-4 rounded-lg shadow">
+            <h3 className="text-sm font-medium text-gray-500">Estoque Baixo</h3>
+            <p className="text-2xl font-bold text-yellow-600">{lowStockSupplies.length}</p>
+          </Card>
+          <Card className="bg-white p-4 rounded-lg shadow">
+            <h3 className="text-sm font-medium text-gray-500">Esgotados</h3>
+            <p className="text-2xl font-bold text-red-600">{outOfStockSupplies.length}</p>
+          </Card>
+        </div>
+      )}
+
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="inventory" className="flex items-center gap-2">
             <Package className="h-4 w-4" />
             Estoque
@@ -209,6 +250,10 @@ export default function InventoryPage() {
           <TabsTrigger value="contracts" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
             Contratos
+          </TabsTrigger>
+          <TabsTrigger value="supplies" className="flex items-center gap-2">
+            <Printer className="h-4 w-4" />
+            Suprimentos
           </TabsTrigger>
           <TabsTrigger value="tools" className="flex items-center gap-2">
             <QrCode className="h-4 w-4" />
@@ -251,6 +296,14 @@ export default function InventoryPage() {
             contracts={maintenanceContracts}
             onAddContract={addMaintenanceContract}
             onUpdateContract={updateMaintenanceContract}
+          />
+        </TabsContent>
+
+        <TabsContent value="supplies" className="space-y-4">
+          <PrinterSupplyManager
+            supplies={printerSupplies}
+            onAddSupply={addPrinterSupply}
+            onUpdateSupply={updatePrinterSupply}
           />
         </TabsContent>
 
