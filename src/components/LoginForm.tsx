@@ -16,25 +16,28 @@ export function LoginForm() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setSuccess('');
 
     if (!email || !password) {
       setError('Por favor, preencha todos os campos');
       return;
     }
 
-    const success = await login(email, password);
-    
-    if (success) {
-      showSuccess('Login realizado com sucesso!');
-    } else {
-      setError('Email ou senha incorretos');
-      showError('Email ou senha incorretos');
+    try {
+      const success = await login(email, password);
+      
+      if (success) {
+        showSuccess('Login realizado com sucesso!');
+      } else {
+        setError('Email ou senha incorretos');
+        showError('Email ou senha incorretos');
+      }
+    } catch (error) {
+      setError('Erro ao realizar login');
+      showError('Erro ao realizar login');
     }
   };
 
@@ -100,12 +103,6 @@ export function LoginForm() {
               {error && (
                 <Alert variant="destructive">
                   <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-
-              {success && (
-                <Alert>
-                  <AlertDescription>{success}</AlertDescription>
                 </Alert>
               )}
 
