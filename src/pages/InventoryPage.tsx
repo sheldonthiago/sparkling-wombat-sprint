@@ -22,6 +22,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Badge } from '@/components/ui/badge';
 import { Plus, Package, Key, FileText, QrCode, AlertTriangle, Printer, Wrench, History, ArrowRightLeft, BarChart3 } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
+import { useSearchParams } from 'react-router-dom';
 
 export default function InventoryPage() {
   const {
@@ -53,10 +54,18 @@ export default function InventoryPage() {
     updateMaintenanceContract
   } = useSupabaseInventory();
 
+  const [searchParams, setSearchParams] = useSearchParams();
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
-  const [selectedTab, setSelectedTab] = useState('inventory');
   const [selectedItemForMaintenance, setSelectedItemForMaintenance] = useState<InventoryItem | null>(null);
+
+  // Obter a aba da query string, padrão é 'inventory'
+  const selectedTab = searchParams.get('tab') || 'inventory';
+
+  // Função para mudar a aba e atualizar a query string
+  const handleTabChange = (value: string) => {
+    setSearchParams({ tab: value });
+  };
 
   const handleAddItem = async (data: any) => {
     try {
@@ -75,6 +84,7 @@ export default function InventoryPage() {
       await updateItem(editingItem.id, data);
       showSuccess('Ativo atualizado com sucesso!');
       setEditingItem(null);
+      setShowAddForm(false);
     } catch (error) {
       showError('Erro ao atualizar ativo');
     }
@@ -267,7 +277,7 @@ export default function InventoryPage() {
         </div>
       )}
 
-      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-4">
+      <Tabs value={selectedTab} onValueChange={handleTabChange} className="space-y-4">
         <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="inventory" className="flex items-center gap-2">
             <Package className="h-4 w-4" />
@@ -306,7 +316,7 @@ export default function InventoryPage() {
         <TabsContent value="inventory" className="space-y-4">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">Gerenciamento de Ativos</h2>
-            <Button onClick={() => setShowAddForm(true)}>
+            <Button onClick={() => { setEditingItem(null); setShowAddForm(true); }}>
               <Plus className="h-4 w-4 mr-2" />
               Adicionar Ativo
             </Button>
