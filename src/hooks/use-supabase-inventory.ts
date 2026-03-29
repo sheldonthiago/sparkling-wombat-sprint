@@ -403,6 +403,12 @@ export function useSupabaseInventory() {
     setMaintenanceContracts(prev => [...prev, newContract]);
   };
 
+  const updateMaintenanceContract = (id: string, updates: Partial<MaintenanceContract>) => {
+    setMaintenanceContracts(prev => prev.map(contract => 
+      contract.id === id ? { ...contract, ...updates } : contract
+    ));
+  };
+
   const addMaintenance = (maintenance: Omit<Maintenance, 'id' | 'createdAt' | 'updatedAt'>) => {
     const newMaintenance: Maintenance = {
       ...maintenance,
@@ -479,6 +485,7 @@ export function useSupabaseInventory() {
     addSoftwareLicense,
     updateSoftwareLicense,
     addMaintenanceContract,
+    updateMaintenanceContract,
     addMaintenance,
     updateMaintenance,
     addPrinterSupply,
