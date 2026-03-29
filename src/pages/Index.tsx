@@ -41,7 +41,8 @@ import {
   Circle,
   Square,
   Pentagon,
-  Octagon
+  Octagon,
+  Wrench
 } from "lucide-react";
 
 const Index = () => {
