@@ -10,14 +10,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, Printer, Package, AlertTriangle, CheckCircle, Minus, FileText } from 'lucide-react';
+import { Plus, Printer, Package, AlertTriangle, CheckCircle, Minus, FileText, Building } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 
 interface PrinterSupplyManagerProps {
   supplies: PrinterSupply[];
   onAddSupply: (supply: Omit<PrinterSupply, 'id'>) => void;
   onUpdateSupply: (id: string, updates: Partial<PrinterSupply>) => void;
-  onRemoveSupply?: (id: string, quantity: number, reason: string) => void; // Nova prop para saída
+  onRemoveSupply?: (id: string, quantity: number, reason: string, sector?: string) => void; // Adicionado setor
 }
 
 export function PrinterSupplyManager({ supplies, onAddSupply, onUpdateSupply, onRemoveSupply }: PrinterSupplyManagerProps) {
@@ -44,7 +44,8 @@ export function PrinterSupplyManager({ supplies, onAddSupply, onUpdateSupply, on
   const [removeFormData, setRemoveFormData] = useState({
     quantity: 1,
     reason: '',
-    date: new Date().toISOString().split('T')[0]
+    date: new Date().toISOString().split('T')[0],
+    sector: '' // Novo campo de setor
   });
 
   const resetForm = () => {
@@ -70,7 +71,8 @@ export function PrinterSupplyManager({ supplies, onAddSupply, onUpdateSupply, on
     setRemoveFormData({
       quantity: 1,
       reason: '',
-      date: new Date().toISOString().split('T')[0]
+      date: new Date().toISOString().split('T')[0],
+      sector: ''
     });
     setRemovingSupply(null);
   };
@@ -102,7 +104,7 @@ export function PrinterSupplyManager({ supplies, onAddSupply, onUpdateSupply, on
     if (!removingSupply || !onRemoveSupply) return;
     
     try {
-      onRemoveSupply(removingSupply.id, removeFormData.quantity, removeFormData.reason);
+      onRemoveSupply(removingSupply.id, removeFormData.quantity, removeFormData.reason, removeFormData.sector);
       showSuccess(`${removeFormData.quantity} ${removingSupply.unit}(s) removido(s) com sucesso!`);
       resetRemoveForm();
       setShowRemoveForm(false);
@@ -183,6 +185,17 @@ export function PrinterSupplyManager({ supplies, onAddSupply, onUpdateSupply, on
                 {removingSupply && (
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label>Setor</Label>
+                        <Input 
+                          value={removeFormData.sector}
+                          onChange={(e) => setRemoveFormData({
+                            ...removeFormData,
+                            sector: e.target.value
+                          })}
+                          placeholder="Ex: TI, Financeiro, RH"
+                        />
+                      </div>
                       <div>
                         <Label>Quantidade a Remover</Label>
                         <Input 
@@ -523,7 +536,8 @@ export function PrinterSupplyManager({ supplies, onAddSupply, onUpdateSupply, on
                           setRemoveFormData({
                             quantity: 1,
                             reason: '',
-                            date: new Date().toISOString().split('T')[0]
+                            date: new Date().toISOString().split('T')[0],
+                            sector: ''
                           });
                           setShowRemoveForm(true);
                         }}

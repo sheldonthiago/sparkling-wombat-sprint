@@ -112,6 +112,7 @@ export function useSupabaseInventory() {
             user: movement.user,
             recipient: movement.recipient,
             returnDate: movement.return_date ? new Date(movement.return_date) : undefined,
+            sector: movement.sector || '', // Adicionado campo de setor
           });
           
           const convertSoftwareLicense = (license: any) => ({
@@ -288,7 +289,8 @@ export function useSupabaseInventory() {
       quantity: 1,
       reason: 'Cadastro inicial',
       date: new Date(),
-      user: 'Sistema'
+      user: 'Sistema',
+      sector: 'TI' // Setor padrão
     });
   };
 
@@ -356,7 +358,8 @@ export function useSupabaseInventory() {
         reason: `Alocado para ${recipient}`,
         date: new Date(),
         user: 'Sistema',
-        recipient
+        recipient,
+        sector: 'TI' // Setor padrão
       });
     }
   };
@@ -376,7 +379,8 @@ export function useSupabaseInventory() {
         quantity: 1,
         reason: 'Devolução',
         date: new Date(),
-        user: 'Sistema'
+        user: 'Sistema',
+        sector: 'TI' // Setor padrão
       });
     }
   };
@@ -440,7 +444,7 @@ export function useSupabaseInventory() {
     ));
   };
 
-  const removePrinterSupply = (id: string, quantity: number, reason: string) => {
+  const removePrinterSupply = (id: string, quantity: number, reason: string, sector?: string) => {
     setPrinterSupplies(prev => prev.map(supply => {
       if (supply.id === id) {
         const newQuantity = supply.quantity - quantity;
@@ -459,7 +463,8 @@ export function useSupabaseInventory() {
       quantity,
       reason: `Saída de suprimento: ${reason}`,
       date: new Date(),
-      user: 'Sistema'
+      user: 'Sistema',
+      sector: sector || 'TI' // Usar setor informado ou padrão
     });
   };
 
