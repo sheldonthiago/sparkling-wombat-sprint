@@ -9,12 +9,14 @@ import { QRCodeGenerator } from '@/components/inventory/QRCodeGenerator';
 import { SoftwareLicenseManager } from '@/components/inventory/SoftwareLicenseManager';
 import { MaintenanceContractManager } from '@/components/inventory/MaintenanceContractManager';
 import { PrinterSupplyManager } from '@/components/inventory/PrinterSupplyManager';
+import { MaintenanceManager } from '@/components/inventory/MaintenanceManager';
+import { MaintenanceHistory } from '@/components/inventory/MaintenanceHistory';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Package, Key, FileText, QrCode, AlertTriangle, Printer } from 'lucide-react';
+import { Plus, Package, Key, FileText, QrCode, AlertTriangle, Printer, Wrench, History } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 
 export default function InventoryPage() {
@@ -24,6 +26,7 @@ export default function InventoryPage() {
     softwareLicenses,
     maintenanceContracts,
     printerSupplies,
+    maintenances,
     addItem,
     updateItem,
     deleteItem,
@@ -33,17 +36,20 @@ export default function InventoryPage() {
     addSoftwareLicense,
     updateSoftwareLicense,
     addMaintenanceContract,
-    updateMaintenanceContract,
+    addMaintenance,
+    updateMaintenance,
     addPrinterSupply,
     updatePrinterSupply,
     getLowStockSupplies,
     getOutOfStockSupplies,
+    getMaintenancesByItem,
     loading
   } = useSupabaseInventory();
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const [selectedTab, setSelectedTab] = useState('inventory');
+  const [selectedItemForMaintenance, setSelectedItemForMaintenance] = useState<InventoryItem | null>(null);
 
   const handleAddItem = async (data: any) => {
     try {
@@ -100,19 +106,7 @@ export default function InventoryPage() {
   };
 
   const handleMaintenance = async (id: string) => {
-    try {
-      await addMovement({
-        itemId: id,
-        type: 'maintenance',
-        quantity: 1,
-        reason: 'Início de manutenção',
-        date: new Date(),
-        user: 'Sistema'
-      });
-      showSuccess('Ativo enviado para manutenção!');
-    } catch (error) {
-      showError('Erro ao enviar para manutenção');
-    }
+    setSelectedItemForMaintenance(items.find(item => item.id === id) || null);
   };
 
   const itemsNearWarrantyExpiry = items.filter(item => 
@@ -153,7 +147,7 @@ export default function InventoryPage() {
       </div>
 
       {/* Alertas de expiração e estoque */}
-      {(itemsNearWarrantyExpiry.length > 0 || itemsExpiringSoon.length > 0 || contractsExpiringSoon.length > 0 || lowStockSupplies.length > 0 || outOfStockSupplies.length > 0) && (
+      {(itemsNearWarrantyExpiry.length > 0 || itemsExpiringSoon.length > 0 || contractsExpiringSoon.length > 0 || lowStockSupplies.length > 0 || outOfStockSupplies.length > 0 || maintenances.filter(m => m.status === 'in_progress').length > 0) && (
         <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
           <div className="flex items-center gap-2 mb-2">
             <AlertTriangle className="h-5 w-5 text-yellow-600" />
@@ -192,6 +186,13 @@ export default function InventoryPage() {
               <div>
                 <p className="text-yellow-700">
                   {lowStockSupplies.length} suprimento(s) de impressora com estoque baixo
+                </p>
+              </div>
+            )}
+            {maintenances.filter(m => m.status === 'in_progress').length > 0 && (
+              <div>
+                <p className="text-blue-700">
+                  {maintenances.filter(m => m.status === 'in_progress').length} manutenção(ões) em andamento
                 </p>
               </div>
             )}
@@ -238,10 +239,14 @@ export default function InventoryPage() {
       )}
 
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="inventory" className="flex items-center gap-2">
             <Package className="h-4 w-4" />
             Ativos
+          </TabsTrigger>
+          <TabsTrigger value="maintenance" className="flex items-center gap-2">
+            <Wrench className="h-4 w-4" />
+            Manutenções
           </TabsTrigger>
           <TabsTrigger value="licenses" className="flex items-center gap-2">
             <Key className="h-4 w-4" />
@@ -280,6 +285,15 @@ export default function InventoryPage() {
             onAllocate={handleAllocateItem}
             onReturn={handleReturnItem}
             onMaintenance={handleMaintenance}
+          />
+        </TabsContent>
+
+        <TabsContent value="maintenance" className="space-y-4">
+          <MaintenanceManager
+            maintenances={maintenances}
+            items={items}
+            onAddMaintenance={addMaintenance}
+            onUpdateMaintenance={updateMaintenance}
           />
         </TabsContent>
 
@@ -377,9 +391,30 @@ export default function InventoryPage() {
               invoiceNumber: editingItem.invoiceNumber,
               value: editingItem.value,
               assignedTo: editingItem.assignedTo,
+              assignedEmail: editingItem.assignedEmail,
+              assignedPhone: editingItem.assignedPhone,
+              assignedMatricula: editingItem.assignedMatricula,
               notes: editingItem.notes,
             } : undefined}
           />
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog para histórico de manutenções */}
+      <Dialog open={!!selectedItemForMaintenance} onOpenChange={() => setSelectedItemForMaintenance(null)}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <History className="h-5 w-5" />
+              Histórico de Manutenções
+            </DialogTitle>
+          </DialogHeader>
+          {selectedItemForMaintenance && (
+            <MaintenanceHistory
+              maintenances={getMaintenancesByItem(selectedItemForMaintenance.id)}
+              itemName={selectedItemForMaintenance.name}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </div>

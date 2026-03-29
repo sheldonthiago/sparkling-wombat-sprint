@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { InventoryItem, InventoryMovement, InventoryStats, SoftwareLicense, MaintenanceContract, PrinterSupply } from '@/types/inventory';
+import { InventoryItem, InventoryMovement, InventoryStats, SoftwareLicense, MaintenanceContract, PrinterSupply, Maintenance } from '@/types/inventory';
 
 export function useSupabaseInventory() {
   const [items, setItems] = useState<InventoryItem[]>([]);
@@ -8,6 +8,7 @@ export function useSupabaseInventory() {
   const [softwareLicenses, setSoftwareLicenses] = useState<SoftwareLicense[]>([]);
   const [maintenanceContracts, setMaintenanceContracts] = useState<MaintenanceContract[]>([]);
   const [printerSupplies, setPrinterSupplies] = useState<PrinterSupply[]>([]);
+  const [maintenances, setMaintenances] = useState<Maintenance[]>([]);
   const [stats, setStats] = useState<InventoryStats>({
     totalItems: 0,
     totalValue: 0,
@@ -23,7 +24,7 @@ export function useSupabaseInventory() {
   // Verificar se o Supabase está configurado
   useEffect(() => {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANon_KEY;
     setUseSupabase(!!(supabaseUrl && supabaseAnonKey));
   }, []);
 
@@ -61,6 +62,20 @@ export function useSupabaseInventory() {
           
           if (contractsError) throw contractsError;
           
+          // Carregar manutenções
+          const { data: maintenancesData, error: maintenancesError } = await supabase
+            .from('maintenances')
+            .select('*')
+            .order('created_at', { ascending: false });
+          
+          if (maintenancesError) throw maintenancesError;
+
+          const { data: suppliesData, error: suppliesError } = await supabase
+            .from('printer_supplies')
+            .select('*');
+          
+          if (suppliesError) throw suppliesError;
+          
           // Converter dados
           const convertItem = (item: any) => ({
             id: item.id,
@@ -79,6 +94,9 @@ export function useSupabaseInventory() {
             invoiceNumber: item.invoice_number,
             value: item.value,
             assignedTo: item.assigned_to,
+            assignedEmail: item.assigned_email,
+            assignedPhone: item.assigned_phone,
+            assignedMatricula: item.assigned_matricula,
             assignedDate: item.assigned_date ? new Date(item.assigned_date) : undefined,
             notes: item.notes,
             lastUpdated: new Date(item.updated_at),
@@ -122,6 +140,27 @@ export function useSupabaseInventory() {
             notes: contract.notes,
           });
 
+          const convertMaintenance = (maintenance: any) => ({
+            id: maintenance.id,
+            itemId: maintenance.item_id,
+            title: maintenance.title,
+            description: maintenance.description,
+            type: maintenance.type,
+            status: maintenance.status,
+            priority: maintenance.priority,
+            startDate: new Date(maintenance.start_date),
+            endDate: maintenance.end_date ? new Date(maintenance.end_date) : null,
+            responsible: maintenance.responsible,
+            responsibleEmail: maintenance.responsible_email,
+            responsiblePhone: maintenance.responsible_phone,
+            responsibleMatricula: maintenance.responsible_matricula,
+            cost: maintenance.cost,
+            notes: maintenance.notes,
+            createdBy: maintenance.created_by,
+            createdAt: new Date(maintenance.created_at),
+            updatedAt: new Date(maintenance.updated_at),
+          });
+
           const convertPrinterSupply = (supply: any) => ({
             id: supply.id,
             name: supply.name,
@@ -143,19 +182,22 @@ export function useSupabaseInventory() {
           setMovements(movementsData.map(convertMovement));
           setSoftwareLicenses(softwareData.map(convertSoftwareLicense));
           setMaintenanceContracts(contractsData.map(convertMaintenanceContract));
-          setPrinterSupplies([]); // Implementar quando tiver tabela no Supabase
+          setMaintenances(maintenancesData.map(convertMaintenance));
+          setPrinterSupplies(suppliesData.map(convertPrinterSupply));
         } else {
           // Carregar do localStorage
           const savedItems = localStorage.getItem('inventory-data-items');
           const savedMovements = localStorage.getItem('inventory-data-movements');
           const savedSoftware = localStorage.getItem('software-licenses');
           const savedContracts = localStorage.getItem('maintenance-contracts');
+          const savedMaintenances = localStorage.getItem('maintenances');
           const savedSupplies = localStorage.getItem('printer-supplies');
           
           if (savedItems) setItems(JSON.parse(savedItems));
           if (savedMovements) setMovements(JSON.parse(savedMovements));
           if (savedSoftware) setSoftwareLicenses(JSON.parse(savedSoftware));
           if (savedContracts) setMaintenanceContracts(JSON.parse(savedContracts));
+          if (savedMaintenances) setMaintenances(JSON.parse(savedMaintenances));
           if (savedSupplies) setPrinterSupplies(JSON.parse(savedSupplies));
         }
       } catch (error) {
@@ -165,12 +207,14 @@ export function useSupabaseInventory() {
         const savedMovements = localStorage.getItem('inventory-data-movements');
         const savedSoftware = localStorage.getItem('software-licenses');
         const savedContracts = localStorage.getItem('maintenance-contracts');
+        const savedMaintenances = localStorage.getItem('maintenances');
         const savedSupplies = localStorage.getItem('printer-supplies');
         
         if (savedItems) setItems(JSON.parse(savedItems));
         if (savedMovements) setMovements(JSON.parse(savedMovements));
         if (savedSoftware) setSoftwareLicenses(JSON.parse(savedSoftware));
         if (savedContracts) setMaintenanceContracts(JSON.parse(savedContracts));
+        if (savedMaintenances) setMaintenances(JSON.parse(savedMaintenances));
         if (savedSupplies) setPrinterSupplies(JSON.parse(savedSupplies));
       } finally {
         setLoading(false);
@@ -193,6 +237,7 @@ export function useSupabaseInventory() {
           localStorage.setItem('inventory-data-movements', JSON.stringify(movements));
           localStorage.setItem('software-licenses', JSON.stringify(softwareLicenses));
           localStorage.setItem('maintenance-contracts', JSON.stringify(maintenanceContracts));
+          localStorage.setItem('maintenances', JSON.stringify(maintenances));
           localStorage.setItem('printer-supplies', JSON.stringify(printerSupplies));
         }
         calculateStats();
@@ -202,7 +247,7 @@ export function useSupabaseInventory() {
     };
 
     saveData();
-  }, [items, movements, softwareLicenses, maintenanceContracts, printerSupplies, useSupabase]);
+  }, [items, movements, softwareLicenses, maintenanceContracts, maintenances, printerSupplies, useSupabase]);
 
   const calculateStats = () => {
     const totalItems = items.length;
@@ -358,6 +403,23 @@ export function useSupabaseInventory() {
     setMaintenanceContracts(prev => [...prev, newContract]);
   };
 
+  const addMaintenance = (maintenance: Omit<Maintenance, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newMaintenance: Maintenance = {
+      ...maintenance,
+      id: Date.now().toString(),
+      createdBy: 'Sistema',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    setMaintenances(prev => [...prev, newMaintenance]);
+  };
+
+  const updateMaintenance = (id: string, updates: Partial<Maintenance>) => {
+    setMaintenances(prev => prev.map(maintenance => 
+      maintenance.id === id ? { ...maintenance, ...updates, updatedAt: new Date() } : maintenance
+    ));
+  };
+
   const addPrinterSupply = (supply: Omit<PrinterSupply, 'id'>) => {
     const newSupply: PrinterSupply = {
       ...supply,
@@ -384,6 +446,10 @@ export function useSupabaseInventory() {
     );
   };
 
+  const getMaintenancesByItem = (itemId: string) => {
+    return maintenances.filter(maintenance => maintenance.itemId === itemId);
+  };
+
   const getLowStockSupplies = () => {
     return printerSupplies.filter(supply => 
       supply.quantity <= supply.minStock && supply.quantity > 0
@@ -400,6 +466,7 @@ export function useSupabaseInventory() {
     softwareLicenses,
     maintenanceContracts,
     printerSupplies,
+    maintenances,
     stats,
     loading,
     useSupabase,
@@ -412,10 +479,13 @@ export function useSupabaseInventory() {
     addSoftwareLicense,
     updateSoftwareLicense,
     addMaintenanceContract,
+    addMaintenance,
+    updateMaintenance,
     addPrinterSupply,
     updatePrinterSupply,
     getItemsByStatus,
     getItemsNearWarrantyExpiry,
+    getMaintenancesByItem,
     getLowStockSupplies,
     getOutOfStockSupplies
   };

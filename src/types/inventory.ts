@@ -99,6 +99,27 @@ export interface MaintenanceContract {
   notes: string;
 }
 
+export interface Maintenance {
+  id: string;
+  itemId: string;
+  title: string;
+  description: string;
+  type: 'preventive' | 'corrective';
+  status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  startDate: Date;
+  endDate: Date | null;
+  responsible: string;
+  responsibleEmail?: string;
+  responsiblePhone?: string;
+  responsibleMatricula?: string;
+  cost: number;
+  notes: string;
+  createdBy: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export const CATEGORIES = [
   // Hardware
   'Notebooks',
@@ -183,4 +204,23 @@ export const MOVEMENT_TYPES = [
   { value: 'return', label: 'Devolução', color: 'green' },
   { value: 'maintenance', label: 'Manutenção', color: 'yellow' },
   { value: 'discard', label: 'Descarte', color: 'red' }
+];
+
+export const MAINTENANCE_TYPES = [
+  { value: 'preventive', label: 'Preventiva', color: 'bg-blue-100 text-blue-800' },
+  { value: 'corrective', label: 'Corretiva', color: 'bg-red-100 text-red-800' }
+];
+
+export const MAINTENANCE_STATUSES = [
+  { value: 'scheduled', label: 'Agendada', color: 'bg-yellow-100 text-yellow-800' },
+  { value: 'in_progress', label: 'Em Andamento', color: 'bg-blue-100 text-blue-800' },
+  { value: 'completed', label: 'Concluída', color: 'bg-green-100 text-green-800' },
+  { value: 'cancelled', label: 'Cancelada', color: 'bg-gray-100 text-gray-800' }
+];
+
+export const MAINTENANCE_PRIORITIES = [
+  { value: 'low', label: 'Baixa', color: 'bg-green-100 text-green-800' },
+  { value: 'medium', label: 'Média', color: 'bg-yellow-100 text-yellow-800' },
+  { value: 'high', label: 'Alta', color: 'bg-orange-100 text-orange-800' },
+  { value: 'critical', label: 'Crítica', color: 'bg-red-100 text-red-800' }
 ];
