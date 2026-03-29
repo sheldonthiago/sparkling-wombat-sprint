@@ -36,7 +36,6 @@ import {
   Satellite,
   Orbit,
   Atom,
-  Flux,
   Hexagon,
   Triangle,
   Circle,
@@ -293,7 +292,7 @@ const Index = () => {
   const techStack = [
     { name: "React 19", icon: Atom },
     { name: "TypeScript", icon: Triangle },
-    { name: "Tailwind CSS", icon: Flux },
+    { name: "Tailwind CSS", icon: Square },
     { name: "Supabase", icon: Database },
     { name: "Shadcn UI", icon: Hexagon },
     { name: "Vite", icon: Zap }
@@ -509,7 +508,7 @@ const Index = () => {
                 variant="outline"
                 className="px-12 py-8 text-xl border-2 border-slate-600 text-slate-300 hover:border-cyan-400 hover:text-cyan-300 hover:bg-cyan-900/20 backdrop-blur-sm transition-all duration-300"
               >
-                <Video className="h-6 w-6 mr-3" />
+                <Globe className="h-6 w-6 mr-3" />
                 Ver Vídeo Demo
               </Button>
             </div>
