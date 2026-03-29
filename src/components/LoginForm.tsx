@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +13,7 @@ import { showSuccess, showError } from '@/utils/toast';
 
 export function LoginForm() {
   const { login, isLoading } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -31,6 +33,7 @@ export function LoginForm() {
       
       if (success) {
         showSuccess('Login realizado com sucesso!');
+        navigate('/');
       } else {
         setError('Email ou senha incorretos');
         showError('Email ou senha incorretos');
