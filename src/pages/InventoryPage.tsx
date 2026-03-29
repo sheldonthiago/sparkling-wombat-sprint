@@ -43,7 +43,8 @@ export default function InventoryPage() {
     getLowStockSupplies,
     getOutOfStockSupplies,
     getMaintenancesByItem,
-    loading
+    loading,
+    updateMaintenanceContract // Adicionando a função importada
   } = useSupabaseInventory();
 
   const [showAddForm, setShowAddForm] = useState(false);
