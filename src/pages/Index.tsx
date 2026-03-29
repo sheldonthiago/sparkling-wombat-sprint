@@ -2,13 +2,44 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useSupabaseInventory } from "@/hooks/use-supabase-inventory";
+import { NotificationSystem } from "@/components/NotificationSystem";
 
 const Index = () => {
   const navigate = useNavigate();
   const { stats, loading } = useSupabaseInventory();
 
+  // Simular carregamento inicial
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Simular tempo de carregamento
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Carregando sistema...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 relative">
+      <NotificationSystem
+        items={[]}
+        supplies={[]}
+        movements={[]}
+        maintenances={[]}
+      />
+      
       <div className="text-center max-w-md">
         <div className="mb-8">
           <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">

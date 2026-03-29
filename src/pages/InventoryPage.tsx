@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSupabaseInventory } from '@/hooks/use-supabase-inventory';
 import { InventoryItem } from '@/types/inventory';
 import { InventoryForm } from '@/components/inventory/InventoryForm';
@@ -12,6 +12,7 @@ import { PrinterSupplyManager } from '@/components/inventory/PrinterSupplyManage
 import { MaintenanceManager } from '@/components/inventory/MaintenanceManager';
 import { MaintenanceHistory } from '@/components/inventory/MaintenanceHistory';
 import { MovementManager } from '@/components/inventory/MovementManager';
+import { NotificationSystem } from '@/components/NotificationSystem';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -130,6 +131,12 @@ export default function InventoryPage() {
   const lowStockSupplies = getLowStockSupplies();
   const outOfStockSupplies = getOutOfStockSupplies();
 
+  const delayedLoans = movements.filter(movement => 
+    movement.type === 'loan' && 
+    movement.returnDate && 
+    new Date(movement.returnDate) < new Date()
+  );
+
   if (loading) {
     return (
       <div className="container mx-auto p-6">
@@ -144,14 +151,21 @@ export default function InventoryPage() {
   }
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto p-6 relative">
+      <NotificationSystem
+        items={items}
+        supplies={printerSupplies}
+        movements={movements}
+        maintenances={maintenances}
+      />
+
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-2">Sistema de Ativos de TI</h1>
         <p className="text-gray-600">Gerencie seu inventário de materiais de informática</p>
       </div>
 
       {/* Alertas de expiração e estoque */}
-      {(itemsNearWarrantyExpiry.length > 0 || itemsExpiringSoon.length > 0 || contractsExpiringSoon.length > 0 || lowStockSupplies.length > 0 || outOfStockSupplies.length > 0 || maintenances.filter(m => m.status === 'in_progress').length > 0 || movements.filter(m => m.type === 'loan' && m.returnDate && new Date() > new Date(m.returnDate)).length > 0) && (
+      {(itemsNearWarrantyExpiry.length > 0 || itemsExpiringSoon.length > 0 || contractsExpiringSoon.length > 0 || lowStockSupplies.length > 0 || outOfStockSupplies.length > 0 || maintenances.filter(m => m.status === 'in_progress').length > 0 || delayedLoans.length > 0) && (
         <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
           <div className="flex items-center gap-2 mb-2">
             <AlertTriangle className="h-5 w-5 text-yellow-600" />
@@ -200,10 +214,10 @@ export default function InventoryPage() {
                 </p>
               </div>
             )}
-            {movements.filter(m => m.type === 'loan' && m.returnDate && new Date() > new Date(m.returnDate)).length > 0 && (
+            {delayedLoans.length > 0 && (
               <div>
                 <p className="text-red-700">
-                  {movements.filter(m => m.type === 'loan' && m.returnDate && new Date() > new Date(m.returnDate)).length} empréstimo(s) atrasado(s)
+                  {delayedLoans.length} empréstimo(s) atrasado(s)
                 </p>
               </div>
             )}
