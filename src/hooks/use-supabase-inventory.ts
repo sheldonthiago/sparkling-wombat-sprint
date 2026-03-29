@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { InventoryItem, InventoryMovement, InventoryStats, SoftwareLicense, MaintenanceContract, PrinterSupply, Maintenance } from '@/types/inventory';
+import { InventoryItem, InventoryMovement, InventoryStats, SoftwareLicense, MaintenanceContract, PrinterSupply, Maintenance, User } from '@/types/inventory';
 
 export function useSupabaseInventory() {
   const [items, setItems] = useState<InventoryItem[]>([]);
@@ -9,6 +9,7 @@ export function useSupabaseInventory() {
   const [maintenanceContracts, setMaintenanceContracts] = useState<MaintenanceContract[]>([]);
   const [printerSupplies, setPrinterSupplies] = useState<PrinterSupply[]>([]);
   const [maintenances, setMaintenances] = useState<Maintenance[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [stats, setStats] = useState<InventoryStats>({
     totalItems: 0,
     totalValue: 0,
@@ -24,7 +25,7 @@ export function useSupabaseInventory() {
   // Verificar se o Supabase está configurado
   useEffect(() => {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANon_KEY;
+    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
     setUseSupabase(!!(supabaseUrl && supabaseAnonKey));
   }, []);
 
@@ -75,6 +76,13 @@ export function useSupabaseInventory() {
             .select('*');
           
           if (suppliesError) throw suppliesError;
+
+          const { data: usersData, error: usersError } = await supabase
+            .from('users')
+            .select('*')
+            .order('created_at', { ascending: false });
+          
+          if (usersError) throw usersError;
           
           // Converter dados
           const convertItem = (item: any) => ({
@@ -179,6 +187,20 @@ export function useSupabaseInventory() {
             nextPurchaseDate: supply.next_purchase_date ? new Date(supply.next_purchase_date) : null,
             notes: supply.notes,
           });
+
+          const convertUser = (user: any) => ({
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            department: user.department,
+            matricula: user.matricula,
+            phone: user.phone,
+            status: user.status,
+            lastLogin: user.last_login ? new Date(user.last_login) : undefined,
+            createdAt: new Date(user.created_at),
+            updatedAt: new Date(user.updated_at),
+          });
           
           setItems(itemsData.map(convertItem));
           setMovements(movementsData.map(convertMovement));
@@ -186,6 +208,7 @@ export function useSupabaseInventory() {
           setMaintenanceContracts(contractsData.map(convertMaintenanceContract));
           setMaintenances(maintenancesData.map(convertMaintenance));
           setPrinterSupplies(suppliesData.map(convertPrinterSupply));
+          setUsers(usersData.map(convertUser));
         } else {
           // Carregar do localStorage
           const savedItems = localStorage.getItem('inventory-data-items');
@@ -194,6 +217,7 @@ export function useSupabaseInventory() {
           const savedContracts = localStorage.getItem('maintenance-contracts');
           const savedMaintenances = localStorage.getItem('maintenances');
           const savedSupplies = localStorage.getItem('printer-supplies');
+          const savedUsers = localStorage.getItem('system-users');
           
           if (savedItems) setItems(JSON.parse(savedItems));
           if (savedMovements) setMovements(JSON.parse(savedMovements));
@@ -201,6 +225,16 @@ export function useSupabaseInventory() {
           if (savedContracts) setMaintenanceContracts(JSON.parse(savedContracts));
           if (savedMaintenances) setMaintenances(JSON.parse(savedMaintenances));
           if (savedSupplies) setPrinterSupplies(JSON.parse(savedSupplies));
+          if (savedUsers) {
+            const parsedUsers = JSON.parse(savedUsers);
+            const usersWithDates = parsedUsers.map((user: any) => ({
+              ...user,
+              lastLogin: user.lastLogin ? new Date(user.lastLogin) : undefined,
+              createdAt: new Date(user.createdAt),
+              updatedAt: new Date(user.updatedAt),
+            }));
+            setUsers(usersWithDates);
+          }
         }
       } catch (error) {
         console.error('Error loading data:', error);
@@ -211,6 +245,7 @@ export function useSupabaseInventory() {
         const savedContracts = localStorage.getItem('maintenance-contracts');
         const savedMaintenances = localStorage.getItem('maintenances');
         const savedSupplies = localStorage.getItem('printer-supplies');
+        const savedUsers = localStorage.getItem('system-users');
         
         if (savedItems) setItems(JSON.parse(savedItems));
         if (savedMovements) setMovements(JSON.parse(savedMovements));
@@ -218,6 +253,16 @@ export function useSupabaseInventory() {
         if (savedContracts) setMaintenanceContracts(JSON.parse(savedContracts));
         if (savedMaintenances) setMaintenances(JSON.parse(savedMaintenances));
         if (savedSupplies) setPrinterSupplies(JSON.parse(savedSupplies));
+        if (savedUsers) {
+          const parsedUsers = JSON.parse(savedUsers);
+          const usersWithDates = parsedUsers.map((user: any) => ({
+            ...user,
+            lastLogin: user.lastLogin ? new Date(user.lastLogin) : undefined,
+            createdAt: new Date(user.createdAt),
+            updatedAt: new Date(user.updatedAt),
+          }));
+          setUsers(usersWithDates);
+        }
       } finally {
         setLoading(false);
       }
@@ -241,6 +286,7 @@ export function useSupabaseInventory() {
           localStorage.setItem('maintenance-contracts', JSON.stringify(maintenanceContracts));
           localStorage.setItem('maintenances', JSON.stringify(maintenances));
           localStorage.setItem('printer-supplies', JSON.stringify(printerSupplies));
+          localStorage.setItem('system-users', JSON.stringify(users));
         }
         calculateStats();
       } catch (error) {
@@ -249,7 +295,7 @@ export function useSupabaseInventory() {
     };
 
     saveData();
-  }, [items, movements, softwareLicenses, maintenanceContracts, maintenances, printerSupplies, useSupabase]);
+  }, [items, movements, softwareLicenses, maintenanceContracts, maintenances, printerSupplies, users, useSupabase]);
 
   const calculateStats = () => {
     const totalItems = items.length;
@@ -468,6 +514,45 @@ export function useSupabaseInventory() {
     });
   };
 
+  const addUser = (user: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newUser: User = {
+      ...user,
+      id: Date.now().toString(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    setUsers(prev => [...prev, newUser]);
+  };
+
+  const updateUser = (id: string, updates: Partial<User>) => {
+    setUsers(prev => prev.map(user => 
+      user.id === id 
+        ? { ...user, ...updates, updatedAt: new Date() }
+        : user
+    ));
+  };
+
+  const deleteUser = (id: string) => {
+    setUsers(prev => prev.filter(user => user.id !== id));
+  };
+
+  const getUserByEmail = (email: string) => {
+    return users.find(user => user.email.toLowerCase() === email.toLowerCase());
+  };
+
+  const getUsersByRole = (role: string) => {
+    return users.filter(user => user.role === role);
+  };
+
+  const getUsersByDepartment = (department: string) => {
+    return users.filter(user => user.department === department);
+  };
+
+  const getActiveUsers = () => {
+    return users.filter(user => user.status === 'active');
+  };
+
   const getItemsByStatus = (status: string) => {
     return items.filter(item => item.status === status);
   };
@@ -501,6 +586,7 @@ export function useSupabaseInventory() {
     maintenanceContracts,
     printerSupplies,
     maintenances,
+    users,
     stats,
     loading,
     useSupabase,
@@ -519,6 +605,13 @@ export function useSupabaseInventory() {
     addPrinterSupply,
     updatePrinterSupply,
     removePrinterSupply,
+    addUser,
+    updateUser,
+    deleteUser,
+    getUserByEmail,
+    getUsersByRole,
+    getUsersByDepartment,
+    getActiveUsers,
     getItemsByStatus,
     getItemsNearWarrantyExpiry,
     getMaintenancesByItem,

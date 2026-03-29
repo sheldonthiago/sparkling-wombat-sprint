@@ -112,7 +112,8 @@ import {
   Thermometer,
   Compass,
   Map,
-  Navigation
+  Navigation,
+  Users
 } from "lucide-react";
 
 export default function InventoryPage() {
@@ -258,6 +259,7 @@ export default function InventoryPage() {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
     { id: 'assets', label: 'Ativos', icon: Package },
+    { id: 'users', label: 'Usuários', icon: Users },
     { id: 'maintenance', label: 'Manutenções', icon: Wrench },
     { id: 'movements', label: 'Movimentações', icon: ArrowRightLeft },
     { id: 'licenses', label: 'Licenças', icon: Key },
@@ -576,6 +578,25 @@ export default function InventoryPage() {
                 onAllocate={handleAllocateItem}
                 onReturn={handleReturnItem}
                 onMaintenance={handleMaintenance}
+              />
+            </div>
+          )}
+
+          {/* Users Section */}
+          {activeSection === 'users' && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h1 className="text-3xl font-bold text-white mb-2">Gerenciamento de Usuários</h1>
+                  <p className="text-slate-400">Controle de acesso e permissões</p>
+                </div>
+              </div>
+
+              <UserManager
+                users={users}
+                onAddUser={addUser}
+                onUpdateUser={updateUser}
+                onDeleteUser={deleteUser}
               />
             </div>
           )}
