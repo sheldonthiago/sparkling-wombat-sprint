@@ -1,5 +1,6 @@
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Button } from "@/components/ui/button";
+import { Header } from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { useSupabaseInventory } from "@/hooks/use-supabase-inventory";
 import { NotificationSystem } from "@/components/NotificationSystem";
@@ -33,12 +34,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 relative">
-      <NotificationSystem
-        items={[]}
-        supplies={[]}
-        movements={[]}
-        maintenances={[]}
-      />
+      <Header title="Sistema de Ativos" />
       
       <div className="text-center max-w-md">
         <div className="mb-8">

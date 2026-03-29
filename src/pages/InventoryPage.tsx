@@ -14,6 +14,7 @@ import { MaintenanceHistory } from '@/components/inventory/MaintenanceHistory';
 import { MovementManager } from '@/components/inventory/MovementManager';
 import { ReportsTab } from '@/components/ReportsTab';
 import { NotificationSystem } from '@/components/NotificationSystem';
+import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -153,6 +154,8 @@ export default function InventoryPage() {
 
   return (
     <div className="container mx-auto p-6 relative">
+      <Header title="Gerenciamento de Ativos" />
+      
       <NotificationSystem
         items={items}
         supplies={printerSupplies}
