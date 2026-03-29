@@ -3,6 +3,7 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Header } from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { useSupabaseInventory } from "@/hooks/use-supabase-inventory";
+import { useAuth } from "@/hooks/use-auth";
 import { 
   Card, 
   CardContent, 
@@ -50,6 +51,7 @@ import {
 
 const Index = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { 
     items, 
     stats, 
