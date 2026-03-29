@@ -11,12 +11,13 @@ import { MaintenanceContractManager } from '@/components/inventory/MaintenanceCo
 import { PrinterSupplyManager } from '@/components/inventory/PrinterSupplyManager';
 import { MaintenanceManager } from '@/components/inventory/MaintenanceManager';
 import { MaintenanceHistory } from '@/components/inventory/MaintenanceHistory';
+import { MovementManager } from '@/components/inventory/MovementManager';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Package, Key, FileText, QrCode, AlertTriangle, Printer, Wrench, History } from 'lucide-react';
+import { Plus, Package, Key, FileText, QrCode, AlertTriangle, Printer, Wrench, History, ArrowRightLeft } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 
 export default function InventoryPage() {
@@ -27,6 +28,7 @@ export default function InventoryPage() {
     maintenanceContracts,
     printerSupplies,
     maintenances,
+    movements,
     addItem,
     updateItem,
     deleteItem,
@@ -44,7 +46,7 @@ export default function InventoryPage() {
     getOutOfStockSupplies,
     getMaintenancesByItem,
     loading,
-    updateMaintenanceContract // Adicionando a função importada
+    updateMaintenanceContract
   } = useSupabaseInventory();
 
   const [showAddForm, setShowAddForm] = useState(false);
@@ -148,7 +150,7 @@ export default function InventoryPage() {
       </div>
 
       {/* Alertas de expiração e estoque */}
-      {(itemsNearWarrantyExpiry.length > 0 || itemsExpiringSoon.length > 0 || contractsExpiringSoon.length > 0 || lowStockSupplies.length > 0 || outOfStockSupplies.length > 0 || maintenances.filter(m => m.status === 'in_progress').length > 0) && (
+      {(itemsNearWarrantyExpiry.length > 0 || itemsExpiringSoon.length > 0 || contractsExpiringSoon.length > 0 || lowStockSupplies.length > 0 || outOfStockSupplies.length > 0 || maintenances.filter(m => m.status === 'in_progress').length > 0 || movements.filter(m => m.type === 'loan' && m.returnDate && new Date() > new Date(m.returnDate)).length > 0) && (
         <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
           <div className="flex items-center gap-2 mb-2">
             <AlertTriangle className="h-5 w-5 text-yellow-600" />
@@ -197,6 +199,13 @@ export default function InventoryPage() {
                 </p>
               </div>
             )}
+            {movements.filter(m => m.type === 'loan' && m.returnDate && new Date() > new Date(m.returnDate)).length > 0 && (
+              <div>
+                <p className="text-red-700">
+                  {movements.filter(m => m.type === 'loan' && m.returnDate && new Date() > new Date(m.returnDate)).length} empréstimo(s) atrasado(s)
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -240,7 +249,7 @@ export default function InventoryPage() {
       )}
 
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="inventory" className="flex items-center gap-2">
             <Package className="h-4 w-4" />
             Ativos
@@ -248,6 +257,10 @@ export default function InventoryPage() {
           <TabsTrigger value="maintenance" className="flex items-center gap-2">
             <Wrench className="h-4 w-4" />
             Manutenções
+          </TabsTrigger>
+          <TabsTrigger value="movements" className="flex items-center gap-2">
+            <ArrowRightLeft className="h-4 w-4" />
+            Movimentações
           </TabsTrigger>
           <TabsTrigger value="licenses" className="flex items-center gap-2">
             <Key className="h-4 w-4" />
@@ -295,6 +308,14 @@ export default function InventoryPage() {
             items={items}
             onAddMaintenance={addMaintenance}
             onUpdateMaintenance={updateMaintenance}
+          />
+        </TabsContent>
+
+        <TabsContent value="movements" className="space-y-4">
+          <MovementManager
+            movements={movements}
+            items={items}
+            onAddMovement={addMovement}
           />
         </TabsContent>
 
