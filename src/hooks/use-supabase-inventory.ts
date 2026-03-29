@@ -440,6 +440,29 @@ export function useSupabaseInventory() {
     ));
   };
 
+  const removePrinterSupply = (id: string, quantity: number, reason: string) => {
+    setPrinterSupplies(prev => prev.map(supply => {
+      if (supply.id === id) {
+        const newQuantity = supply.quantity - quantity;
+        return {
+          ...supply,
+          quantity: Math.max(0, newQuantity) // Garante que não fique negativo
+        };
+      }
+      return supply;
+    }));
+
+    // Registrar movimento de saída
+    addMovement({
+      itemId: 'SUPPLY-' + id, // Usar ID do suprimento
+      type: 'exit',
+      quantity,
+      reason: `Saída de suprimento: ${reason}`,
+      date: new Date(),
+      user: 'Sistema'
+    });
+  };
+
   const getItemsByStatus = (status: string) => {
     return items.filter(item => item.status === status);
   };
@@ -490,6 +513,7 @@ export function useSupabaseInventory() {
     updateMaintenance,
     addPrinterSupply,
     updatePrinterSupply,
+    removePrinterSupply, // Nova função exportada
     getItemsByStatus,
     getItemsNearWarrantyExpiry,
     getMaintenancesByItem,

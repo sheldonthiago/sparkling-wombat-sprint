@@ -42,6 +42,7 @@ export default function InventoryPage() {
     updateMaintenance,
     addPrinterSupply,
     updatePrinterSupply,
+    removePrinterSupply,
     getLowStockSupplies,
     getOutOfStockSupplies,
     getMaintenancesByItem,
@@ -340,6 +341,7 @@ export default function InventoryPage() {
             supplies={printerSupplies}
             onAddSupply={addPrinterSupply}
             onUpdateSupply={updatePrinterSupply}
+            onRemoveSupply={removePrinterSupply}
           />
         </TabsContent>
 
