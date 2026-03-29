@@ -8,14 +8,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Shield, Eye, EyeOff, UserPlus } from 'lucide-react';
+import { UserPlus, Eye, EyeOff } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 
-export function LoginForm() {
-  const { login, isLoading } = useAuth();
+export function RegisterForm() {
+  const { register, isLoading } = useAuth();
   const navigate = useNavigate();
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
 
@@ -23,46 +25,69 @@ export function LoginForm() {
     e.preventDefault();
     setError('');
 
-    if (!email || !password) {
+    if (!name || !email || !password || !confirmPassword) {
       setError('Por favor, preencha todos os campos');
       return;
     }
 
+    if (password !== confirmPassword) {
+      setError('As senhas não coincidem');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('A senha deve ter pelo menos 6 caracteres');
+      return;
+    }
+
     try {
-      const success = await login(email, password);
+      const success = await register(name, email, password);
       
       if (success) {
-        showSuccess('Login realizado com sucesso!');
+        showSuccess('Cadastro realizado com sucesso!');
         navigate('/');
       } else {
-        setError('Email ou senha incorretos');
-        showError('Email ou senha incorretos');
+        setError('Email já cadastrado');
+        showError('Email já cadastrado');
       }
     } catch (error) {
-      setError('Erro ao realizar login');
-      showError('Erro ao realizar login');
+      setError('Erro ao realizar cadastro');
+      showError('Erro ao realizar cadastro');
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-100 p-4">
       <div className="w-full max-w-md">
         <Card className="shadow-lg">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
-                <Shield className="h-8 w-8 text-white" />
+              <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center">
+                <UserPlus className="h-8 w-8 text-white" />
               </div>
             </div>
             <CardTitle className="text-2xl font-bold text-gray-900">
-              Sistema de Ativos
+              Criar Conta
             </CardTitle>
             <p className="text-gray-600 mt-2">
-              Acesse sua conta para continuar
+              Cadastre-se para acessar o sistema
             </p>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="name">Nome Completo</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="João Silva"
+                  className="mt-1"
+                  disabled={isLoading}
+                />
+              </div>
+              
               <div>
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -70,7 +95,7 @@ export function LoginForm() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@empresa.com"
+                  placeholder="joao@empresa.com"
                   className="mt-1"
                   disabled={isLoading}
                 />
@@ -84,7 +109,7 @@ export function LoginForm() {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Digite sua senha"
+                    placeholder="Mínimo 6 caracteres"
                     className="pr-10"
                     disabled={isLoading}
                   />
@@ -103,6 +128,19 @@ export function LoginForm() {
                 </div>
               </div>
 
+              <div>
+                <Label htmlFor="confirmPassword">Confirmar Senha</Label>
+                <Input
+                  id="confirmPassword"
+                  type={showPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirme sua senha"
+                  className="mt-1"
+                  disabled={isLoading}
+                />
+              </div>
+
               {error && (
                 <Alert variant="destructive">
                   <AlertDescription>{error}</AlertDescription>
@@ -111,33 +149,22 @@ export function LoginForm() {
 
               <Button 
                 type="submit" 
-                className="w-full" 
+                className="w-full bg-purple-600 hover:bg-purple-700" 
                 disabled={isLoading}
               >
-                {isLoading ? 'Entrando...' : 'Entrar'}
+                {isLoading ? 'Cadastrando...' : 'Cadastrar'}
               </Button>
             </form>
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
-                Não tem uma conta?{' '}
+                Já tem uma conta?{' '}
                 <a 
-                  href="/register" 
-                  className="text-blue-600 hover:text-blue-700 font-medium flex items-center justify-center gap-1"
+                  href="/login" 
+                  className="text-purple-600 hover:text-purple-700 font-medium"
                 >
-                  <UserPlus className="h-4 w-4" />
-                  Criar conta
+                  Faça login
                 </a>
-              </p>
-            </div>
-
-            <div className="mt-6 text-center text-sm text-gray-600 border-t pt-4">
-              <p className="font-medium">Dados de teste:</p>
-              <p className="mt-1">
-                <strong>Admin:</strong> admin@empresa.com / admin123
-              </p>
-              <p>
-                <strong>Usuário:</strong> usuario@empresa.com / usuario123
               </p>
             </div>
           </CardContent>

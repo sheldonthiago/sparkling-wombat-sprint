@@ -10,6 +10,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
+  register: (name: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -36,16 +37,16 @@ export function useAuth(): AuthContextType {
     setIsLoading(true);
     
     try {
-      // Simulação de autenticação - em um sistema real, isso seria uma chamada API
+      // Simulação de autenticação
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Usuários válidos (em um sistema real, isso viria do backend)
-      const validUsers = [
-        { id: '1', name: 'Administrador', email: 'admin@empresa.com', password: 'admin123', role: 'admin' as const },
-        { id: '2', name: 'Usuário', email: 'usuario@empresa.com', password: 'usuario123', role: 'user' as const },
+      // Buscar usuários salvos
+      const savedUsers = localStorage.getItem('registered-users');
+      const users = savedUsers ? JSON.parse(savedUsers) : [
+        { id: '1', name: 'Administrador', email: 'admin@empresa.com', password: 'admin123', role: 'admin' }
       ];
       
-      const foundUser = validUsers.find(u => u.email === email && u.password === password);
+      const foundUser = users.find(u => u.email === email && u.password === password);
       
       if (foundUser) {
         const { password, ...userWithoutPassword } = foundUser;
@@ -63,6 +64,50 @@ export function useAuth(): AuthContextType {
     }
   };
 
+  const register = async (name: string, email: string, password: string): Promise<boolean> => {
+    setIsLoading(true);
+    
+    try {
+      // Simulação de registro
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Buscar usuários salvos
+      const savedUsers = localStorage.getItem('registered-users');
+      const users = savedUsers ? JSON.parse(savedUsers) : [
+        { id: '1', name: 'Administrador', email: 'admin@empresa.com', password: 'admin123', role: 'admin' }
+      ];
+      
+      // Verificar se email já existe
+      if (users.find(u => u.email === email)) {
+        return false;
+      }
+      
+      // Criar novo usuário
+      const newUser = {
+        id: Date.now().toString(),
+        name,
+        email,
+        password,
+        role: 'user' as const
+      };
+      
+      users.push(newUser);
+      localStorage.setItem('registered-users', JSON.stringify(users));
+      
+      // Fazer login automático após registro
+      const { password, ...userWithoutPassword } = newUser;
+      setUser(userWithoutPassword);
+      localStorage.setItem('user', JSON.stringify(userWithoutPassword));
+      
+      return true;
+    } catch (error) {
+      console.error('Register error:', error);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
@@ -71,6 +116,7 @@ export function useAuth(): AuthContextType {
   return {
     user,
     login,
+    register,
     logout,
     isLoading
   };
