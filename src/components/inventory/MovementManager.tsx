@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, ArrowRightLeft, Calendar, User, Package, AlertTriangle } from 'lucide-react';
+import { Plus, ArrowRightLeft, Calendar, User, Package, AlertTriangle, Building } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 
 interface MovementManagerProps {
@@ -29,7 +29,8 @@ export function MovementManager({ movements, items, onAddMovement }: MovementMan
     date: new Date().toISOString().split('T')[0],
     user: '',
     recipient: '',
-    returnDate: ''
+    returnDate: '',
+    sector: '' // Novo campo de setor
   });
 
   const resetForm = () => {
@@ -41,7 +42,8 @@ export function MovementManager({ movements, items, onAddMovement }: MovementMan
       date: new Date().toISOString().split('T')[0],
       user: '',
       recipient: '',
-      returnDate: ''
+      returnDate: '',
+      sector: ''
     });
   };
 
@@ -78,6 +80,11 @@ export function MovementManager({ movements, items, onAddMovement }: MovementMan
   const getItemSerial = (itemId: string) => {
     const item = items.find(i => i.id === itemId);
     return item ? item.serialNumber : '';
+  };
+
+  const getItemSector = (itemId: string) => {
+    const item = items.find(i => i.id === itemId);
+    return item ? item.location : 'Não informado';
   };
 
   const isOverdue = (returnDate: Date | null) => {
@@ -144,6 +151,14 @@ export function MovementManager({ movements, items, onAddMovement }: MovementMan
                       ))}
                     </SelectContent>
                   </Select>
+                </div>
+                <div>
+                  <Label>Setor</Label>
+                  <Input 
+                    value={formData.sector}
+                    onChange={(e) => setFormData({...formData, sector: e.target.value})}
+                    placeholder="Ex: TI, Financeiro, RH"
+                  />
                 </div>
                 <div>
                   <Label>Quantidade</Label>
@@ -257,7 +272,14 @@ export function MovementManager({ movements, items, onAddMovement }: MovementMan
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
+                    <div>
+                      <p className="text-sm text-gray-500">Setor</p>
+                      <p className="font-medium flex items-center gap-1">
+                        <Building className="h-4 w-4 text-gray-400" />
+                        {movement.sector || getItemSector(movement.itemId)}
+                      </p>
+                    </div>
                     <div>
                       <p className="text-sm text-gray-500">Quantidade</p>
                       <p className="font-medium">{movement.quantity}</p>
