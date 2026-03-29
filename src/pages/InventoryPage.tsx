@@ -48,10 +48,10 @@ export default function InventoryPage() {
   const handleAddItem = async (data: any) => {
     try {
       await addItem(data);
-      showSuccess('Item adicionado com sucesso!');
+      showSuccess('Ativo adicionado com sucesso!');
       setShowAddForm(false);
     } catch (error) {
-      showError('Erro ao adicionar item');
+      showError('Erro ao adicionar ativo');
     }
   };
 
@@ -60,32 +60,32 @@ export default function InventoryPage() {
     
     try {
       await updateItem(editingItem.id, data);
-      showSuccess('Item atualizado com sucesso!');
+      showSuccess('Ativo atualizado com sucesso!');
       setEditingItem(null);
     } catch (error) {
-      showError('Erro ao atualizar item');
+      showError('Erro ao atualizar ativo');
     }
   };
 
   const handleDeleteItem = async (id: string) => {
-    if (confirm('Tem certeza que deseja excluir este item?')) {
+    if (confirm('Tem certeza que deseja excluir este ativo?')) {
       try {
         await deleteItem(id);
-        showSuccess('Item excluído com sucesso!');
+        showSuccess('Ativo excluído com sucesso!');
       } catch (error) {
-        showError('Erro ao excluir item');
+        showError('Erro ao excluir ativo');
       }
     }
   };
 
   const handleAllocateItem = async (id: string) => {
-    const recipient = prompt('Para quem deseja alocar este item?');
+    const recipient = prompt('Para quem deseja alocar este ativo?');
     if (recipient) {
       try {
         await allocateItem(id, recipient);
-        showSuccess('Item alocado com sucesso!');
+        showSuccess('Ativo alocado com sucesso!');
       } catch (error) {
-        showError('Erro ao alocar item');
+        showError('Erro ao alocar ativo');
       }
     }
   };
@@ -93,9 +93,9 @@ export default function InventoryPage() {
   const handleReturnItem = async (id: string) => {
     try {
       await returnItem(id);
-      showSuccess('Item devolvido com sucesso!');
+      showSuccess('Ativo devolvido com sucesso!');
     } catch (error) {
-      showError('Erro ao devolver item');
+      showError('Erro ao devolver ativo');
     }
   };
 
@@ -109,7 +109,7 @@ export default function InventoryPage() {
         date: new Date(),
         user: 'Sistema'
       });
-      showSuccess('Item enviado para manutenção!');
+      showSuccess('Ativo enviado para manutenção!');
     } catch (error) {
       showError('Erro ao enviar para manutenção');
     }
@@ -148,7 +148,7 @@ export default function InventoryPage() {
   return (
     <div className="container mx-auto p-6">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">Sistema de Estoque de TI</h1>
+        <h1 className="text-3xl font-bold mb-2">Sistema de Ativos de TI</h1>
         <p className="text-gray-600">Gerencie seu inventário de materiais de informática</p>
       </div>
 
@@ -163,7 +163,7 @@ export default function InventoryPage() {
             {itemsNearWarrantyExpiry.length > 0 && (
               <div>
                 <p className="text-yellow-700">
-                  {itemsNearWarrantyExpiry.length} item(s) com garantia próxima do vencimento
+                  {itemsNearWarrantyExpiry.length} ativo(s) com garantia próxima do vencimento
                 </p>
               </div>
             )}
@@ -202,7 +202,7 @@ export default function InventoryPage() {
       {/* Dashboard de estatísticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <Card className="bg-white p-4 rounded-lg shadow">
-          <h3 className="text-sm font-medium text-gray-500">Total de Itens</h3>
+          <h3 className="text-sm font-medium text-gray-500">Total de Ativos</h3>
           <p className="text-2xl font-bold">{stats.totalItems}</p>
         </Card>
         <Card className="bg-white p-4 rounded-lg shadow">
@@ -210,7 +210,7 @@ export default function InventoryPage() {
           <p className="text-2xl font-bold">R$ {stats.totalValue.toFixed(2)}</p>
         </Card>
         <Card className="bg-white p-4 rounded-lg shadow">
-          <h3 className="text-sm font-medium text-gray-500">Itens Alocados</h3>
+          <h3 className="text-sm font-medium text-gray-500">Ativos Alocados</h3>
           <p className="text-2xl font-bold">{stats.allocatedItems}</p>
         </Card>
         <Card className="bg-white p-4 rounded-lg shadow">
@@ -241,7 +241,7 @@ export default function InventoryPage() {
         <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="inventory" className="flex items-center gap-2">
             <Package className="h-4 w-4" />
-            Estoque
+            Ativos
           </TabsTrigger>
           <TabsTrigger value="licenses" className="flex items-center gap-2">
             <Key className="h-4 w-4" />
@@ -263,10 +263,10 @@ export default function InventoryPage() {
 
         <TabsContent value="inventory" className="space-y-4">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Gerenciamento de Estoque</h2>
+            <h2 className="text-xl font-semibold">Gerenciamento de Ativos</h2>
             <Button onClick={() => setShowAddForm(true)}>
               <Plus className="h-4 w-4 mr-2" />
-              Adicionar Item
+              Adicionar Ativo
             </Button>
           </div>
 
@@ -311,11 +311,11 @@ export default function InventoryPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <QRCodeGenerator
               itemId="SAMPLE-001"
-              itemName="Exemplo de Item"
+              itemName="Exemplo de Ativo"
             />
             <Card>
               <CardHeader>
-                <CardTitle>Ferramentas de Inventário</CardTitle>
+                <CardTitle>Ferramentas de Ativos</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -347,12 +347,12 @@ export default function InventoryPage() {
         </TabsContent>
       </Tabs>
 
-      {/* Dialog para adicionar/editar item */}
+      {/* Dialog para adicionar/editar ativo */}
       <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>
-              {editingItem ? 'Editar Item' : 'Adicionar Novo Item'}
+              {editingItem ? 'Editar Ativo' : 'Adicionar Novo Ativo'}
             </DialogTitle>
           </DialogHeader>
           <InventoryForm

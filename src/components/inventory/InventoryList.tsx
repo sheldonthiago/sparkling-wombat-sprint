@@ -56,8 +56,8 @@ export function InventoryList({ items, onEdit, onDelete, onAllocate, onReturn, o
       <Card>
         <CardContent className="p-6 text-center">
           <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum item encontrado</h3>
-          <p className="text-gray-500">Adicione seu primeiro item ao inventário.</p>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum ativo encontrado</h3>
+          <p className="text-gray-500">Adicione seu primeiro ativo ao inventário.</p>
         </CardContent>
       </Card>
     );
