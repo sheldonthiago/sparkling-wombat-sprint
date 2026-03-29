@@ -24,7 +24,7 @@ export function useSupabaseInventory() {
   // Verificar se o Supabase está configurado
   useEffect(() => {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANon_KEY;
     setUseSupabase(!!(supabaseUrl && supabaseAnonKey));
   }, []);
 
@@ -155,7 +155,7 @@ export function useSupabaseInventory() {
             responsibleEmail: maintenance.responsible_email,
             responsiblePhone: maintenance.responsible_phone,
             responsibleMatricula: maintenance.responsible_matricula,
-            serviceOrder: maintenance.service_order,
+            serviceOrder: maintenance.service_order, // Novo campo
             cost: maintenance.cost,
             notes: maintenance.notes,
             createdBy: maintenance.created_by,

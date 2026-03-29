@@ -12,17 +12,14 @@ import { PrinterSupplyManager } from '@/components/inventory/PrinterSupplyManage
 import { MaintenanceManager } from '@/components/inventory/MaintenanceManager';
 import { MaintenanceHistory } from '@/components/inventory/MaintenanceHistory';
 import { MovementManager } from '@/components/inventory/MovementManager';
-import { ReportsTab } from '@/components/ReportsTab';
 import { NotificationSystem } from '@/components/NotificationSystem';
-import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Package, Key, FileText, QrCode, AlertTriangle, Printer, Wrench, History, ArrowRightLeft, BarChart3 } from 'lucide-react';
+import { Plus, Package, Key, FileText, QrCode, AlertTriangle, Printer, Wrench, History, ArrowRightLeft } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
-import { useSearchParams } from 'react-router-dom';
 
 export default function InventoryPage() {
   const {
@@ -54,18 +51,10 @@ export default function InventoryPage() {
     updateMaintenanceContract
   } = useSupabaseInventory();
 
-  const [searchParams, setSearchParams] = useSearchParams();
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
+  const [selectedTab, setSelectedTab] = useState('inventory');
   const [selectedItemForMaintenance, setSelectedItemForMaintenance] = useState<InventoryItem | null>(null);
-
-  // Obter a aba da query string, padrão é 'inventory'
-  const selectedTab = searchParams.get('tab') || 'inventory';
-
-  // Função para mudar a aba e atualizar a query string
-  const handleTabChange = (value: string) => {
-    setSearchParams({ tab: value });
-  };
 
   const handleAddItem = async (data: any) => {
     try {
@@ -84,7 +73,6 @@ export default function InventoryPage() {
       await updateItem(editingItem.id, data);
       showSuccess('Ativo atualizado com sucesso!');
       setEditingItem(null);
-      setShowAddForm(false);
     } catch (error) {
       showError('Erro ao atualizar ativo');
     }
@@ -164,8 +152,6 @@ export default function InventoryPage() {
 
   return (
     <div className="container mx-auto p-6 relative">
-      <Header title="Gerenciamento de Ativos" />
-      
       <NotificationSystem
         items={items}
         supplies={printerSupplies}
@@ -173,8 +159,112 @@ export default function InventoryPage() {
         maintenances={maintenances}
       />
 
-      <Tabs value={selectedTab} onValueChange={handleTabChange} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-8">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold mb-2">Sistema de Ativos de TI</h1>
+        <p className="text-gray-600">Gerencie seu inventário de materiais de informática</p>
+      </div>
+
+      {/* Alertas de expiração e estoque */}
+      {(itemsNearWarrantyExpiry.length > 0 || itemsExpiringSoon.length > 0 || contractsExpiringSoon.length > 0 || lowStockSupplies.length > 0 || outOfStockSupplies.length > 0 || maintenances.filter(m => m.status === 'in_progress').length > 0 || delayedLoans.length > 0) && (
+        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="flex items-center gap-2 mb-2">
+            <AlertTriangle className="h-5 w-5 text-yellow-600" />
+            <h3 className="font-semibold text-yellow-800">Alertas e Notificações</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            {itemsNearWarrantyExpiry.length > 0 && (
+              <div>
+                <p className="text-yellow-700">
+                  {itemsNearWarrantyExpiry.length} ativo(s) com garantia próxima do vencimento
+                </p>
+              </div>
+            )}
+            {itemsExpiringSoon.length > 0 && (
+              <div>
+                <p className="text-yellow-700">
+                  {itemsExpiringSoon.length} licença(s) de software expirando em breve
+                </p>
+              </div>
+            )}
+            {contractsExpiringSoon.length > 0 && (
+              <div>
+                <p className="text-yellow-700">
+                  {contractsExpiringSoon.length} contrato(s) de manutenção expirando em breve
+                </p>
+              </div>
+            )}
+            {outOfStockSupplies.length > 0 && (
+              <div>
+                <p className="text-red-700">
+                  {outOfStockSupplies.length} suprimento(s) de impressora esgotado(s)
+                </p>
+              </div>
+            )}
+            {lowStockSupplies.length > 0 && outOfStockSupplies.length === 0 && (
+              <div>
+                <p className="text-yellow-700">
+                  {lowStockSupplies.length} suprimento(s) de impressora com estoque baixo
+                </p>
+              </div>
+            )}
+            {maintenances.filter(m => m.status === 'in_progress').length > 0 && (
+              <div>
+                <p className="text-blue-700">
+                  {maintenances.filter(m => m.status === 'in_progress').length} manutenção(ões) em andamento
+                </p>
+              </div>
+            )}
+            {delayedLoans.length > 0 && (
+              <div>
+                <p className="text-red-700">
+                  {delayedLoans.length} empréstimo(s) atrasado(s)
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Dashboard de estatísticas */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <Card className="bg-white p-4 rounded-lg shadow">
+          <h3 className="text-sm font-medium text-gray-500">Total de Ativos</h3>
+          <p className="text-2xl font-bold">{stats.totalItems}</p>
+        </Card>
+        <Card className="bg-white p-4 rounded-lg shadow">
+          <h3 className="text-sm font-medium text-gray-500">Valor Total</h3>
+          <p className="text-2xl font-bold">R$ {stats.totalValue.toFixed(2)}</p>
+        </Card>
+        <Card className="bg-white p-4 rounded-lg shadow">
+          <h3 className="text-sm font-medium text-gray-500">Ativos Alocados</h3>
+          <p className="text-2xl font-bold">{stats.allocatedItems}</p>
+        </Card>
+        <Card className="bg-white p-4 rounded-lg shadow">
+          <h3 className="text-sm font-medium text-gray-500">Em Manutenção</h3>
+          <p className="text-2xl font-bold">{stats.maintenanceItems}</p>
+        </Card>
+      </div>
+
+      {/* Estatísticas de suprimentos */}
+      {printerSupplies.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <Card className="bg-white p-4 rounded-lg shadow">
+            <h3 className="text-sm font-medium text-gray-500">Suprimentos Totais</h3>
+            <p className="text-2xl font-bold">{printerSupplies.length}</p>
+          </Card>
+          <Card className="bg-white p-4 rounded-lg shadow">
+            <h3 className="text-sm font-medium text-gray-500">Estoque Baixo</h3>
+            <p className="text-2xl font-bold text-yellow-600">{lowStockSupplies.length}</p>
+          </Card>
+          <Card className="bg-white p-4 rounded-lg shadow">
+            <h3 className="text-sm font-medium text-gray-500">Esgotados</h3>
+            <p className="text-2xl font-bold text-red-600">{outOfStockSupplies.length}</p>
+          </Card>
+        </div>
+      )}
+
+      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-4">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="inventory" className="flex items-center gap-2">
             <Package className="h-4 w-4" />
             Ativos
@@ -203,16 +293,12 @@ export default function InventoryPage() {
             <QrCode className="h-4 w-4" />
             Ferramentas
           </TabsTrigger>
-          <TabsTrigger value="reports" className="flex items-center gap-2">
-            <BarChart3 className="h-4 w-4" />
-            Relatórios
-          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="inventory" className="space-y-4">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">Gerenciamento de Ativos</h2>
-            <Button onClick={() => { setEditingItem(null); setShowAddForm(true); }}>
+            <Button onClick={() => setShowAddForm(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Adicionar Ativo
             </Button>
@@ -310,14 +396,6 @@ export default function InventoryPage() {
               </CardContent>
             </Card>
           </div>
-        </TabsContent>
-
-        <TabsContent value="reports" className="space-y-4">
-          <ReportsTab
-            items={items}
-            supplies={printerSupplies}
-            movements={movements}
-          />
         </TabsContent>
       </Tabs>
 
