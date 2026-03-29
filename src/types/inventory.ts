@@ -14,7 +14,10 @@ export interface InventoryItem {
   supplier: string;
   invoiceNumber: string;
   value: number;
-  assignedTo?: string; // Colaborador/Departamento/Projeto
+  assignedTo?: string; // Nome do responsável
+  assignedEmail?: string; // Email do responsável
+  assignedPhone?: string; // Telefone do responsável
+  assignedMatricula?: string; // Matrícula do responsável
   assignedDate?: Date;
   notes: string;
   lastUpdated: Date;

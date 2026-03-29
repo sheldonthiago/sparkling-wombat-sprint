@@ -28,6 +28,9 @@ const inventorySchema = z.object({
   invoiceNumber: z.string().min(1, 'Número da nota fiscal é obrigatório'),
   value: z.number().min(0, 'Valor deve ser maior ou igual a 0'),
   assignedTo: z.string().optional(),
+  assignedEmail: z.string().email('Email inválido').optional().or(z.literal('')),
+  assignedPhone: z.string().optional(),
+  assignedMatricula: z.string().optional(),
   notes: z.string(),
 });
 
@@ -60,6 +63,9 @@ export function InventoryForm({ onSubmit, onCancel, initialData }: InventoryForm
       invoiceNumber: initialData?.invoiceNumber || '',
       value: initialData?.value || 0,
       assignedTo: initialData?.assignedTo || '',
+      assignedEmail: initialData?.assignedEmail || '',
+      assignedPhone: initialData?.assignedPhone || '',
+      assignedMatricula: initialData?.assignedMatricula || '',
       notes: initialData?.notes || '',
     },
   });
@@ -313,9 +319,64 @@ export function InventoryForm({ onSubmit, onCancel, initialData }: InventoryForm
                 name="assignedTo"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Alocado para</FormLabel>
+                    <FormLabel>Responsável</FormLabel>
                     <FormControl>
                       <Input placeholder="Ex: João Silva, TI" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Campos de contato do responsável */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <FormField
+                control={form.control}
+                name="assignedEmail"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email do Responsável</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="email" 
+                        placeholder="exemplo@empresa.com" 
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="assignedPhone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Telefone do Responsável</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="(11) 99999-9999" 
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="assignedMatricula"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Matrícula do Responsável</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="Ex: 123456" 
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

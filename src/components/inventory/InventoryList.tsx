@@ -4,7 +4,7 @@ import { InventoryItem } from '@/types/inventory';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Edit, Trash2, Package, User, Calendar, MapPin } from 'lucide-react';
+import { Edit, Trash2, Package, User, Calendar, MapPin, Mail, Phone, Hash } from 'lucide-react';
 import { STATUSES } from '@/types/inventory';
 
 interface InventoryListProps {
@@ -121,12 +121,45 @@ export function InventoryList({ items, onEdit, onDelete, onAllocate, onReturn, o
               </div>
             </div>
 
+            {/* Informações do responsável */}
             {item.assignedTo && (
-              <div className="mb-4">
-                <p className="text-sm text-gray-500">Alocado para</p>
-                <div className="flex items-center gap-1">
-                  <User className="h-4 w-4 text-gray-400" />
-                  <p className="font-medium">{item.assignedTo}</p>
+              <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+                <p className="text-sm font-medium text-blue-800 mb-2">Informações do Responsável</p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div>
+                    <p className="text-xs text-blue-600">Nome</p>
+                    <p className="font-medium text-sm flex items-center gap-1">
+                      <User className="h-3 w-3" />
+                      {item.assignedTo}
+                    </p>
+                  </div>
+                  {item.assignedEmail && (
+                    <div>
+                      <p className="text-xs text-blue-600">Email</p>
+                      <p className="font-medium text-sm flex items-center gap-1">
+                        <Mail className="h-3 w-3" />
+                        {item.assignedEmail}
+                      </p>
+                    </div>
+                  )}
+                  {item.assignedPhone && (
+                    <div>
+                      <p className="text-xs text-blue-600">Telefone</p>
+                      <p className="font-medium text-sm flex items-center gap-1">
+                        <Phone className="h-3 w-3" />
+                        {item.assignedPhone}
+                      </p>
+                    </div>
+                  )}
+                  {item.assignedMatricula && (
+                    <div>
+                      <p className="text-xs text-blue-600">Matrícula</p>
+                      <p className="font-medium text-sm flex items-center gap-1">
+                        <Hash className="h-3 w-3" />
+                        {item.assignedMatricula}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
