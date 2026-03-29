@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { InventoryItem, InventoryMovement, InventoryStats, SoftwareLicense, MaintenanceContract } from '@/types/inventory';
+import { supabase } from '@/lib/supabase';
 
 const STORAGE_KEY = 'inventory-data';
 const SOFTWARE_KEY = 'software-licenses';
@@ -19,36 +20,169 @@ export function useInventory() {
     allocatedItems: 0,
     maintenanceItems: 0
   });
+  const [loading, setLoading] = useState(true);
+  const [useSupabase, setUseSupabase] = useState(false);
 
-  // Carregar dados do localStorage
+  // Verificar se o Supabase está configurado
   useEffect(() => {
-    try {
-      const savedItems = localStorage.getItem(STORAGE_KEY + '-items');
-      const savedMovements = localStorage.getItem(STORAGE_KEY + '-movements');
-      const savedSoftware = localStorage.getItem(SOFTWARE_KEY);
-      const savedContracts = localStorage.getItem(CONTRACTS_KEY);
-      
-      if (savedItems) setItems(JSON.parse(savedItems));
-      if (savedMovements) setMovements(JSON.parse(savedMovements));
-      if (savedSoftware) setSoftwareLicenses(JSON.parse(savedSoftware));
-      if (savedContracts) setMaintenanceContracts(JSON.parse(savedContracts));
-    } catch (error) {
-      console.error('Error loading data from localStorage:', error);
-    }
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANon_KEY;
+    setUseSupabase(!!(supabaseUrl && supabaseAnonKey));
   }, []);
 
-  // Salvar dados no localStorage
+  // Carregar dados
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY + '-items', JSON.stringify(items));
-      localStorage.setItem(STORAGE_KEY + '-movements', JSON.stringify(movements));
-      localStorage.setItem(SOFTWARE_KEY, JSON.stringify(softwareLicenses));
-      localStorage.setItem(CONTRACTS_KEY, JSON.stringify(maintenanceContracts));
-      calculateStats();
-    } catch (error) {
-      console.error('Error saving data to localStorage:', error);
-    }
-  }, [items, movements, softwareLicenses, maintenanceContracts]);
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        
+        if (useSupabase) {
+          // Carregar do Supabase
+          const { data: itemsData, error: itemsError } = await supabase
+            .from('inventory_items')
+            .select('*')
+            .order('created_at', { ascending: false });
+          
+          if (itemsError) throw itemsError;
+          
+          const { data: movementsData, error: movementsError } = await supabase
+            .from('inventory_movements')
+            .select('*')
+            .order('created_at', { ascending: false });
+          
+          if (movementsError) throw movementsError;
+          
+          const { data: softwareData, error: softwareError } = await supabase
+            .from('software_licenses')
+            .select('*');
+          
+          if (softwareError) throw softwareError;
+          
+          const { data: contractsData, error: contractsError } = await supabase
+            .from('maintenance_contracts')
+            .select('*');
+          
+          if (contractsError) throw contractsError;
+          
+          // Converter dados
+          const convertItem = (item: any) => ({
+            id: item.id,
+            name: item.name,
+            category: item.category,
+            type: item.type,
+            manufacturer: item.manufacturer,
+            model: item.model,
+            specifications: item.specifications,
+            serialNumber: item.serial_number,
+            acquisitionDate: new Date(item.acquisition_date),
+            warrantyExpiry: item.warranty_expiry ? new Date(item.warranty_expiry) : null,
+            location: item.location,
+            status: item.status,
+            supplier: item.supplier,
+            invoiceNumber: item.invoice_number,
+            value: item.value,
+            assignedTo: item.assigned_to,
+            assignedDate: item.assigned_date ? new Date(item.assigned_date) : undefined,
+            notes: item.notes,
+            lastUpdated: new Date(item.updated_at),
+          });
+          
+          const convertMovement = (movement: any) => ({
+            id: movement.id,
+            itemId: movement.item_id,
+            type: movement.type,
+            quantity: movement.quantity,
+            reason: movement.reason,
+            date: new Date(movement.date),
+            user: movement.user,
+            recipient: movement.recipient,
+            returnDate: movement.return_date ? new Date(movement.return_date) : undefined,
+          });
+          
+          const convertSoftwareLicense = (license: any) => ({
+            id: license.id,
+            name: license.name,
+            version: license.version,
+            key: license.key,
+            quantity: license.quantity,
+            usedQuantity: license.used_quantity,
+            expiryDate: license.expiry_date ? new Date(license.expiry_date) : null,
+            assignedTo: license.assigned_to,
+            supplier: license.supplier,
+            value: license.value,
+            notes: license.notes,
+          });
+          
+          const convertMaintenanceContract = (contract: any) => ({
+            id: contract.id,
+            equipmentId: contract.equipment_id,
+            provider: contract.provider,
+            startDate: new Date(contract.start_date),
+            endDate: new Date(contract.end_date),
+            serviceLevel: contract.service_level,
+            cost: contract.cost,
+            status: contract.status,
+            notes: contract.notes,
+          });
+          
+          setItems(itemsData.map(convertItem));
+          setMovements(movementsData.map(convertMovement));
+          setSoftwareLicenses(softwareData.map(convertSoftwareLicense));
+          setMaintenanceContracts(contractsData.map(convertMaintenanceContract));
+        } else {
+          // Carregar do localStorage
+          const savedItems = localStorage.getItem(STORAGE_KEY + '-items');
+          const savedMovements = localStorage.getItem(STORAGE_KEY + '-movements');
+          const savedSoftware = localStorage.getItem(SOFTWARE_KEY);
+          const savedContracts = localStorage.getItem(CONTRACTS_KEY);
+          
+          if (savedItems) setItems(JSON.parse(savedItems));
+          if (savedMovements) setMovements(JSON.parse(savedMovements));
+          if (savedSoftware) setSoftwareLicenses(JSON.parse(savedSoftware));
+          if (savedContracts) setMaintenanceContracts(JSON.parse(savedContracts));
+        }
+      } catch (error) {
+        console.error('Error loading data:', error);
+        // Fallback para localStorage se o Supabase falhar
+        const savedItems = localStorage.getItem(STORAGE_KEY + '-items');
+        const savedMovements = localStorage.getItem(STORAGE_KEY + '-movements');
+        const savedSoftware = localStorage.getItem(SOFTWARE_KEY);
+        const savedContracts = localStorage.getItem(CONTRACTS_KEY);
+        
+        if (savedItems) setItems(JSON.parse(savedItems));
+        if (savedMovements) setMovements(JSON.parse(savedMovements));
+        if (savedSoftware) setSoftwareLicenses(JSON.parse(savedSoftware));
+        if (savedContracts) setMaintenanceContracts(JSON.parse(savedContracts));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [useSupabase]);
+
+  // Salvar dados
+  useEffect(() => {
+    const saveData = async () => {
+      try {
+        if (useSupabase) {
+          // Salvar no Supabase (implementar lógica de salvamento)
+          console.log('Saving to Supabase...');
+        } else {
+          // Salvar no localStorage
+          localStorage.setItem(STORAGE_KEY + '-items', JSON.stringify(items));
+          localStorage.setItem(STORAGE_KEY + '-movements', JSON.stringify(movements));
+          localStorage.setItem(SOFTWARE_KEY, JSON.stringify(softwareLicenses));
+          localStorage.setItem(CONTRACTS_KEY, JSON.stringify(maintenanceContracts));
+        }
+        calculateStats();
+      } catch (error) {
+        console.error('Error saving data:', error);
+      }
+    };
+
+    saveData();
+  }, [items, movements, softwareLicenses, maintenanceContracts, useSupabase]);
 
   const calculateStats = () => {
     const totalItems = items.length;
@@ -57,7 +191,7 @@ export function useInventory() {
     const outOfStockItems = items.filter(item => item.status === 'discarded').length;
     const itemsNearWarrantyExpiry = items.filter(item => 
       item.warrantyExpiry && 
-      new Date(item.warrantyExpiry).getTime() - new Date().getTime() < 90 * 24 * 60 * 60 * 1000 // 90 dias
+      new Date(item.warrantyExpiry).getTime() - new Date().getTime() < 90 * 24 * 60 * 60 * 1000
     ).length;
     const allocatedItems = items.filter(item => item.status === 'allocated').length;
     const maintenanceItems = items.filter(item => item.status === 'maintenance').length;
@@ -222,6 +356,8 @@ export function useInventory() {
     softwareLicenses,
     maintenanceContracts,
     stats,
+    loading,
+    useSupabase,
     addItem,
     updateItem,
     deleteItem,
