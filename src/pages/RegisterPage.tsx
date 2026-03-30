@@ -2,14 +2,13 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useUsers } from '@/hooks/use-users';
+import { hashPassword } from '@/utils/crypto';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserPlus, AlertCircle, Mail, Lock, User, Phone, Hash, Building, CheckCircle } from 'lucide-react';
-import { useUsers } from '@/hooks/use-users';
-import { hashPassword } from '@/utils/crypto';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -97,6 +96,7 @@ export default function RegisterPage() {
       }, 2000);
 
     } catch (err) {
+      console.error('Registration error:', err);
       setError('Erro ao criar conta. Tente novamente.');
     } finally {
       setLoading(false);
