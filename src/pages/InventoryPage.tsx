@@ -222,7 +222,8 @@ export default function InventoryPage() {
                 </Button>
                 
                 <Dialog 
-                  open={selectedItemForQR !== null}                   onOpenChange={() => setSelectedItemForQR(null)}
+                  open={selectedItemForQR !== null} 
+                  onOpenChange={() => setSelectedItemForQR(null)}
                 >
                   <DialogTrigger asChild>
                     <div className="hidden" />
@@ -269,9 +270,7 @@ export default function InventoryPage() {
               onAllocate={allocateItem}
               onReturn={returnItem}
               onMaintenance={(itemId) => {
-                // Navigate to maintenance section or open maintenance form for this item
                 setActiveSection('maintenance');
-                // In a real app, we might pre-fill the maintenance form with this item
               }}
             />
           </div>
@@ -279,11 +278,10 @@ export default function InventoryPage() {
 
         {activeSection === 'users' && (
           <UserManager 
-            users={[]} // Would come from useUsers hook
+            users={[]} 
             onAddUser={handleUserSubmit}
             onUpdateUser={handleUserSubmit}
             onDeleteUser={(id) => {
-              // Would call deleteUser from hook
             }}
           />
         )}
@@ -309,11 +307,12 @@ export default function InventoryPage() {
                       {editingMaintenance ? 'Editar Manutenção' : 'Adicionar Nova Manutenção'}
                     </DialogTitle>
                   </DialogHeader>
-                  {/* In a real app, we would have a maintenance form component here */}
-                  <div className="p-6">
-                    <p className="text-slate-500">Formulário de manutenção em desenvolvimento...</p>
-                    {/* This would be replaced with an actual MaintenanceForm component */}
-                  </div>
+                  <MaintenanceManager 
+                    maintenances={maintenances}
+                    items={items}
+                    onAddMaintenance={addMaintenance}
+                    onUpdateMaintenance={updateMaintenance}
+                  />
                 </DialogContent>
               </Dialog>
             )}
@@ -346,11 +345,11 @@ export default function InventoryPage() {
                   <DialogHeader>
                     <DialogTitle>Registrar Nova Movimentação</DialogTitle>
                   </DialogHeader>
-                  {/* In a real app, we would have a movement form component here */}
-                  <div className="p-6">
-                    <p className="text-slate-500">Formulário de movimentação em desenvolvimento...</p>
-                    {/* This would be replaced with an actual MovementForm component */}
-                  </div>
+                  <MovementManager 
+                    movements={movements}
+                    items={items}
+                    onAddMovement={addMovement}
+                  />
                 </DialogContent>
               </Dialog>
             )}
@@ -385,7 +384,8 @@ export default function InventoryPage() {
                     </DialogTitle>
                   </DialogHeader>
                   <SoftwareLicenseManager 
-                    licenses={[]} // Would come from hook                    onAddLicense={addSoftwareLicense}
+                    licenses={softwareLicenses}
+                    onAddLicense={addSoftwareLicense}
                     onUpdateLicense={updateSoftwareLicense}
                   />
                 </DialogContent>
@@ -393,7 +393,8 @@ export default function InventoryPage() {
             )}
 
             <SoftwareLicenseManager 
-              licenses={[]} // Would come from hook              onAddLicense={addSoftwareLicense}
+              licenses={softwareLicenses}
+              onAddLicense={addSoftwareLicense}
               onUpdateLicense={updateSoftwareLicense}
             />
           </div>
@@ -438,11 +439,6 @@ export default function InventoryPage() {
             />
           </div>
         })}
-
-        {/* Export Manager removed from here - now handled in ReportsPage */}
-        {/*           The ExportManager component has been moved to ReportsPage to keep the 
-          inventory page focused on core asset management functions.
-        */}
       </div>
     </div>
   );
