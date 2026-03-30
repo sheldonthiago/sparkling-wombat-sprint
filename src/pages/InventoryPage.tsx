@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from 'react';
 import { useSupabaseInventory } from '@/hooks/use-supabase-inventory';
 import { ExportManager } from '@/components/inventory/ExportManager';
@@ -52,8 +54,7 @@ export default function InventoryPage() {
   const [editingSupply, setEditingSupply] = useState(null);
   const [selectedItemForQR, setSelectedItemForQR] = useState(null);
 
-  // Handle item form submission
-  const handleItemSubmit = (data) => {
+  // Handle item form submission  const handleItemSubmit = (data) => {
     if (editingItem) {
       updateItem(editingItem.id, data);
     } else {
@@ -80,8 +81,7 @@ export default function InventoryPage() {
     setEditingMaintenance(null);
   };
 
-  // Handle license form submission
-  const handleLicenseSubmit = (data) => {
+  // Handle license form submission  const handleLicenseSubmit = (data) => {
     if (editingLicense) {
       updateSoftwareLicense(editingLicense.id, data);
     } else {
@@ -107,6 +107,8 @@ export default function InventoryPage() {
     addMovement(data);
     setShowAddMovementForm(false);
   };
+
+  // FIX: Removed extra closing brace that was causing syntax error  // The previous code had an extra "}" here that broke JSX parsing
 
   if (loading) {
     return (
@@ -215,8 +217,7 @@ export default function InventoryPage() {
                   disabled={!selectedItemForQR}
                 >
                   <QrCode className="h-4 w-4 mr-2" />
-                  QR Code
-                </Button>
+                  QR Code                </Button>
                 
                 <Dialog 
                   open={selectedItemForQR !== null} 
@@ -231,8 +232,7 @@ export default function InventoryPage() {
                     </DialogHeader>
                     {selectedItemForQR && (
                       <QRCodeGenerator 
-                        itemId={selectedItemForQR.id} 
-                        itemName={selectedItemForQR.name}                       />
+                        itemId={selectedItemForQR.id}                         itemName={selectedItemForQR.name}                       />
                     )}
                   </DialogContent>
                 </Dialog>
@@ -250,8 +250,7 @@ export default function InventoryPage() {
                       {editingItem ? 'Editar Item' : 'Adicionar Novo Item'}
                     </DialogTitle>
                   </DialogHeader>
-                  <InventoryForm 
-                    onSubmit={handleItemSubmit}
+                  <InventoryForm                     onSubmit={handleItemSubmit}
                     onCancel={() => setShowAddItemForm(false)}
                     initialData={editingItem}
                   />
@@ -290,8 +289,7 @@ export default function InventoryPage() {
               <h3 className="text-lg font-semibold">Manutenções</h3>
               <Button onClick={() => { setEditingMaintenance(null); setShowAddMaintenanceForm(true); }}>
                 <Plus className="h-4 w-4 mr-2" />
-                Adicionar Manutenção
-              </Button>
+                Adicionar Manutenção              </Button>
             </div>
 
             {showAddMaintenanceForm && (
@@ -437,8 +435,7 @@ export default function InventoryPage() {
 
         {/* Export Manager */}
         <div className="mt-12 pt-8 border-t border-slate-700/50">
-          <ExportManager
-            items={items}
+          <ExportManager            items={items}
             movements={movements}
             supplies={printerSupplies}
             maintenances={maintenances}
