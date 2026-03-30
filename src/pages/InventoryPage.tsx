@@ -23,6 +23,7 @@ export default function InventoryPage() {
     movements,
     printerSupplies,
     maintenances,
+    softwareLicenses,
     loading,
     addItem,
     updateItem,
@@ -438,7 +439,7 @@ export default function InventoryPage() {
               onRemoveSupply={removePrinterSupply}
             />
           </div>
-        })}
+        )}
       </div>
     </div>
   );
