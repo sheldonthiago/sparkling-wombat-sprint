@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { User } from '@/types/user';
-import { USER_ROLES } from '@/types/user'; // Added import for USER_ROLES
+import { USER_ROLES, USER_STATUSES } from '@/types/user'; // Added both imports
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -30,7 +30,8 @@ export function UserManager({ users, onAddUser, onUpdateUser, onDeleteUser }: Us
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (user.matricula && user.matricula.includes(searchQuery));
-        const matchesRole = roleFilter === 'all' || user.role === roleFilter;
+    
+    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
     const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
     
     return matchesSearch && matchesRole && matchesStatus;
