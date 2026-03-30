@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { UserPlus, AlertCircle, Mail, Lock, User, Phone, Hash, Building } from 'lucide-react';
+import { UserPlus, AlertCircle, Mail, Lock, User, Phone, Hash, Building, CheckCircle } from 'lucide-react';
 import { useUsers } from '@/hooks/use-users';
 import { hashPassword } from '@/utils/crypto';
 
@@ -22,8 +22,8 @@ export default function RegisterPage() {
     phone: '',
   });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
   const { addUser, getUserByEmail } = useUsers();
   const navigate = useNavigate();
 
@@ -90,13 +90,12 @@ export default function RegisterPage() {
         passwordHash,
       });
 
-      // Fazer login automático após cadastro
-      const success = await login(formData.email.trim().toLowerCase(), formData.password);
-      if (success) {
-        navigate('/inventory');
-      } else {
-        setError('Erro ao fazer login após cadastro. Tente fazer login manualmente.');
-      }
+      // Mostrar sucesso e redirecionar para login
+      setSuccess(true);
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
+
     } catch (err) {
       setError('Erro ao criar conta. Tente novamente.');
     } finally {
@@ -116,6 +115,24 @@ export default function RegisterPage() {
     'Desenvolvimento',
     'Segurança da Informação'
   ];
+
+  if (success) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="h-8 w-8 text-white" />
+            </div>
+            <CardTitle className="text-2xl text-white">Cadastro Realizado!</CardTitle>
+            <p className="text-slate-400 text-sm">
+              Sua conta foi criada com sucesso. Você será redirecionado para a página de login.
+            </p>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4">

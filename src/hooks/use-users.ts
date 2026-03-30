@@ -13,7 +13,7 @@ export function useUsers() {
   // Verificar se o Supabase está configurado
   useEffect(() => {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANon_KEY;
     setUseSupabase(!!(supabaseUrl && supabaseAnonKey));
   }, []);
 

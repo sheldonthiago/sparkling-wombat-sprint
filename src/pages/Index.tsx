@@ -43,7 +43,8 @@ import {
   Pentagon,
   Octagon,
   Wrench,
-  LogIn
+  LogIn,
+  UserPlus
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -310,6 +311,10 @@ const Index = () => {
     }
   };
 
+  const handleRegisterClick = () => {
+    navigate("/register");
+  };
+
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
       {/* Canvas para partículas animadas */}
@@ -380,10 +385,11 @@ const Index = () => {
             
             <Button 
               variant="outline"
-              className="px-10 py-7 text-xl border-2 border-slate-600 text-slate-300 hover:border-cyan-400 hover:text-cyan-300 hover:bg-cyan-900/20 backdrop-blur-sm bg-slate-900/50 transition-all duration-300 group"
+              onClick={handleRegisterClick}
+              className="px-10 py-7 text-xl border-2 border-slate-600 text-slate-300 hover:border-cyan-400 hover:text-cyan-300 hover:bg-cyan-900/20 backdrop-blur-sm transition-all duration-300 group"
             >
-              <Globe className="h-6 w-6 mr-3 group-hover:rotate-12 transition-transform" />
-              Ver Demonstração 3D
+              <UserPlus className="h-6 w-6 mr-3 group-hover:rotate-12 transition-transform" />
+              Criar Conta
             </Button>
           </div>
         </header>
@@ -518,10 +524,11 @@ const Index = () => {
               
               <Button 
                 variant="outline"
+                onClick={handleRegisterClick}
                 className="px-12 py-8 text-xl border-2 border-slate-600 text-slate-300 hover:border-cyan-400 hover:text-cyan-300 hover:bg-cyan-900/20 backdrop-blur-sm transition-all duration-300"
               >
-                <Globe className="h-6 w-6 mr-3" />
-                Ver Vídeo Demo
+                <UserPlus className="h-6 w-6 mr-3 group-hover:rotate-12 transition-transform" />
+                Criar Conta Agora
               </Button>
             </div>
             
