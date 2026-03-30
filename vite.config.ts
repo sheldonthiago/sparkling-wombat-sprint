@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react-swc';
 import path from 'path';
 
 export default defineConfig(() => ({
-  base: '/seu-repositorio/', // Mude para o nome do seu repositório
+  base: '/techasset-pro/', // Mude para o nome do seu repositório
   plugins: [react()],
   resolve: {
     alias: {
