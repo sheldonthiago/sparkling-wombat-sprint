@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useSupabaseInventory } from '@/hooks/use-supabase-inventory';
-import { ExportManager } from '@/components/inventory/ExportManager';
 import { Button } from '@/components/ui/button';
 import { ChevronRight, Users, Wrench, ArrowRightLeft, BookOpen, Printer, LogOut, Plus, QrCode } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -223,8 +222,7 @@ export default function InventoryPage() {
                 </Button>
                 
                 <Dialog 
-                  open={selectedItemForQR !== null} 
-                  onOpenChange={() => setSelectedItemForQR(null)}
+                  open={selectedItemForQR !== null}                   onOpenChange={() => setSelectedItemForQR(null)}
                 >
                   <DialogTrigger asChild>
                     <div className="hidden" />
@@ -387,8 +385,7 @@ export default function InventoryPage() {
                     </DialogTitle>
                   </DialogHeader>
                   <SoftwareLicenseManager 
-                    licenses={[]} // Would come from hook
-                    onAddLicense={addSoftwareLicense}
+                    licenses={[]} // Would come from hook                    onAddLicense={addSoftwareLicense}
                     onUpdateLicense={updateSoftwareLicense}
                   />
                 </DialogContent>
@@ -396,8 +393,7 @@ export default function InventoryPage() {
             )}
 
             <SoftwareLicenseManager 
-              licenses={[]} // Would come from hook
-              onAddLicense={addSoftwareLicense}
+              licenses={[]} // Would come from hook              onAddLicense={addSoftwareLicense}
               onUpdateLicense={updateSoftwareLicense}
             />
           </div>
@@ -441,17 +437,12 @@ export default function InventoryPage() {
               onRemoveSupply={removePrinterSupply}
             />
           </div>
-        )}
+        })}
 
-        {/* Export Manager */}
-        <div className="mt-12 pt-8 border-t border-slate-700/50">
-          <ExportManager 
-            items={items}
-            movements={movements}
-            supplies={printerSupplies}
-            maintenances={maintenances}
-          />
-        </div>
+        {/* Export Manager removed from here - now handled in ReportsPage */}
+        {/*           The ExportManager component has been moved to ReportsPage to keep the 
+          inventory page focused on core asset management functions.
+        */}
       </div>
     </div>
   );

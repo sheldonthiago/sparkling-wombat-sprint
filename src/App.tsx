@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-route
 import Index from "./pages/Index";
 import InventoryPage from "./pages/InventoryPage";
 import UsersPage from "./pages/UsersPage";
-import NotFound from "./pages/NotFound";
+import ReportsPage from "./pages/ReportsPage"; // Import the new ReportsPageimport NotFound from "./pages/NotFound";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
@@ -14,14 +14,14 @@ import { useEffect } from "react";
 
 const queryClient = new QueryClient();
 
-// Protected Route Component
+/* Protected Route Component */
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!loading && !user) {
-      navigate('/login');
+      navigate("/login");
     }
   }, [user, loading, navigate]);
 
@@ -62,11 +62,19 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/users"
+            <Route              path="/users"
               element={
                 <ProtectedRoute>
                   <UsersPage />
+                </ProtectedRoute>
+              }
+            />
+            {/* NEW REPORT ROUTE */}
+            <Route
+              path="/reports"
+              element={
+                <ProtectedRoute>
+                  <ReportsPage />
                 </ProtectedRoute>
               }
             />
