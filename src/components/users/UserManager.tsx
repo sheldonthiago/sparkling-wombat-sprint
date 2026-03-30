@@ -12,7 +12,7 @@ import { showSuccess, showError } from '@/utils/toast';
 
 interface UserManagerProps {
   users: User[];
-  onAddUser: (user: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  onAddUser: (user: Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'lastLogin'>) => void;
   onUpdateUser: (id: string, updates: Partial<User>) => void;
   onDeleteUser: (id: string) => void;
 }
@@ -36,7 +36,7 @@ export function UserManager({ users, onAddUser, onUpdateUser, onDeleteUser }: Us
     return matchesSearch && matchesRole && matchesStatus;
   });
 
-  const handleSubmit = (data: any) => {
+  const handleSubmit = (data: Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'lastLogin'>) => {
     try {
       if (editingUser) {
         onUpdateUser(editingUser.id, data);

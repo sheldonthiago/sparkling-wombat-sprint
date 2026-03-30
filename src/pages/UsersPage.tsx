@@ -4,7 +4,8 @@ import { useUsers } from '@/hooks/use-users';
 import { UserManager } from '@/components/users/UserManager';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, Shield, AlertTriangle } from 'lucide-react';
+import { Users, Shield, AlertTriangle, LogOut } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function UsersPage() {
   const {
@@ -15,12 +16,13 @@ export default function UsersPage() {
     deleteUser,
     getActiveUsers,
   } = useUsers();
+  const { user, logout } = useAuth();
 
   const activeUsers = getActiveUsers();
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-blue-300">Carregando usuários...</p>
@@ -98,6 +100,14 @@ export default function UsersPage() {
           onUpdateUser={updateUser}
           onDeleteUser={deleteUser}
         />
+
+        {/* Logout button at bottom */}
+        <div className="mt-8 flex justify-end">
+          <Button variant="outline" onClick={logout} className="flex items-center gap-2">
+            <LogOut className="h-4 w-4" />
+            Sair
+          </Button>
+        </div>
       </div>
     </div>
   );

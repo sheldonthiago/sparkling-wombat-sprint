@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { User } from '@/types/user';
 import { supabase } from '@/lib/supabase';
+import { hashPassword } from '@/utils/crypto';
 
 const USERS_STORAGE_KEY = 'system-users';
 
@@ -40,6 +41,7 @@ export function useUsers() {
             matricula: user.matricula,
             phone: user.phone,
             status: user.status,
+            passwordHash: user.password_hash,
             lastLogin: user.last_login ? new Date(user.last_login) : undefined,
             createdAt: new Date(user.created_at),
             updatedAt: new Date(user.updated_at),
@@ -68,6 +70,7 @@ export function useUsers() {
               role: 'admin',
               department: 'TI',
               status: 'active',
+              passwordHash: await hashPassword('admin123'),
               createdAt: new Date(),
               updatedAt: new Date(),
             };
@@ -118,7 +121,7 @@ export function useUsers() {
     }
   }, [users, loading, useSupabase]);
 
-  const addUser = (user: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const addUser = (user: Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'lastLogin'>) => {
     const newUser: User = {
       ...user,
       id: Date.now().toString(),

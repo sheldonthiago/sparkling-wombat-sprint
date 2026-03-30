@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { USER_ROLES, USER_STATUSES, DEPARTMENTS, User } from '@/types/user';
+import { hashPassword } from '@/utils/crypto';
 
 const userSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
@@ -20,12 +21,22 @@ const userSchema = z.object({
   matricula: z.string().optional(),
   phone: z.string().optional(),
   status: z.enum(['active', 'inactive', 'suspended']),
+  password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres').optional(),
+  confirmPassword: z.string().min(6, 'Confirme a senha').optional(),
+}).refine((data) => {
+  if (data.password || data.confirmPassword) {
+    return data.password === data.confirmPassword;
+  }
+  return true;
+}, {
+  message: "As senhas não coincidem",
+  path: ["confirmPassword"],
 });
 
 type UserFormData = z.infer<typeof userSchema>;
 
 interface UserFormProps {
-  onSubmit: (data: UserFormData) => void;
+  onSubmit: (data: Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'lastLogin'>) => void;
   onCancel?: () => void;
   initialData?: Partial<UserFormData>;
 }
@@ -43,23 +54,49 @@ export function UserForm({ onSubmit, onCancel, initialData }: UserFormProps) {
       matricula: initialData?.matricula || '',
       phone: initialData?.phone || '',
       status: initialData?.status || 'active',
+      password: '',
+      confirmPassword: '',
     },
   });
 
   const handleSubmit = async (data: UserFormData) => {
     setIsSubmitting(true);
     try {
-      onSubmit(data);
+      // If it's a new user (no initialData) and password is provided, hash it
+      let passwordHash: string | undefined;
+      if (!initialData && data.password) {
+        if (data.password !== data.confirmPassword) {
+          form.setError('confirmPassword', { message: 'As senhas não coincidem' });
+          return;
+        }
+        passwordHash = await hashPassword(data.password);
+      }
+
+      // Prepare the data to submit
+      const submitData: Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'lastLogin'> = {
+        name: data.name,
+        email: data.email,
+        role: data.role,
+        department: data.department,
+        matricula: data.matricula,
+        phone: data.phone,
+        status: data.status,
+        ...(passwordHash && { passwordHash }),
+      };
+
+      onSubmit(submitData);
       form.reset();
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const isEditing = !!initialData;
+
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>{initialData ? 'Editar Usuário' : 'Adicionar Novo Usuário'}</CardTitle>
+        <CardTitle>{isEditing ? 'Editar Usuário' : 'Adicionar Novo Usuário'}</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -200,9 +237,42 @@ export function UserForm({ onSubmit, onCancel, initialData }: UserFormProps) {
               />
             </div>
 
+            {/* Password fields - only show for new users */}
+            {!isEditing && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Senha</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="Mínimo 6 caracteres" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Confirmar Senha</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="Confirme a senha" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
+
             <div className="flex gap-2 pt-4">
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Salvando...' : initialData ? 'Atualizar' : 'Adicionar'}
+                {isSubmitting ? 'Salvando...' : isEditing ? 'Atualizar' : 'Adicionar'}
               </Button>
               {onCancel && (
                 <Button type="button" variant="outline" onClick={onCancel}>

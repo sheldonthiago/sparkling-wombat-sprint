@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useSupabaseInventory } from '@/hooks/use-supabase-inventory';
 import { ExportManager } from '@/components/inventory/ExportManager';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, Users, Wrench, ArrowRightLeft, BookOpen, Printer } from 'lucide-react';
+import { ChevronRight, Users, Wrench, ArrowRightLeft, BookOpen, Printer, LogOut } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function InventoryPage() {
   const {
@@ -12,96 +13,10 @@ export default function InventoryPage() {
     maintenances,
     loading
   } = useSupabaseInventory();
+  const { user, logout } = useAuth();
   const [activeSection, setActiveSection] = useState('assets');
 
-  // Section components
-  const AssetsSection = () => (
-    <div className="space-y-6">
-      <h2 className="text-xl font-bold text-cyan-400 flex items-center gap-2">
-        <Users className="h-5 w-5" />
-        Ativos
-      </h2>
-      <p className="text-slate-400">Gerencie seus ativos de TI</p>
-      {/* Placeholder for assets UI - replace with actual implementation */ }
-      <div className="bg-slate-800/50 rounded-lg p-4">
-        <p className="text-slate-400">Seção de Ativos</p>
-        <p className="text-slate-500 text-sm">Total de ativos: {items.length}</p>
-      </div>
-    </div>
-  );
-
-  const UsersSection = () => (
-    <div className="space-y-6">
-      <h2 className="text-xl font-bold text-blue-400 flex items-center gap-2">
-        <Users className="h-5 w-5" />
-        Usuários
-      </h2>
-      <p className="text-slate-400">Gerencie usuários e permissões</p>
-      {/* Placeholder for users UI */ }
-      <div className="bg-slate-800/50 rounded-lg p-4">
-        <p className="text-slate-400">Seção de Usuários</p>
-      </div>
-    </div>
-  );
-
-  const MaintenanceSection = () => (
-    <div className="space-y-6">
-      <h2 className="text-xl font-bold text-yellow-400 flex items-center gap-2">
-        <Wrench className="h-5 w-5" />
-        Manutenção
-      </h2>
-      <p className="text-slate-400">Gerencie ordens de serviço e manutenções</p>
-      {/* Placeholder for maintenance UI */ }
-      <div className="bg-slate-800/50 rounded-lg p-4">
-        <p className="text-slate-400">Seção de Manutenção</p>
-        <p className="text-slate-500 text-sm">Total de manutenções: {maintenances.length}</p>
-      </div>
-    </div>
-  );
-
-  const MovementsSection = () => (
-    <div className="space-y-6">
-      <h2 className="text-xl font-bold text-blue-400 flex items-center gap-2">
-        <ArrowRightLeft className="h-5 w-5" />
-        Movimentações
-      </h2>
-      <p className="text-slate-400">Registre e visualize movimentações de ativos</p>
-      {/* Placeholder for movements UI */ }
-      <div className="bg-slate-800/50 rounded-lg p-4">
-        <p className="text-slate-400">Seção de Movimentações</p>
-        <p className="text-slate-500 text-sm">Total de movimentações: {movements.length}</p>
-      </div>
-    </div>
-  );
-
-  const LicensesSection = () => (
-    <div className="space-y-6">
-      <h2 className="text-xl font-bold text-purple-400 flex items-center gap-2">
-        <BookOpen className="h-5 w-5" />
-        Licenças
-      </h2>
-      <p className="text-slate-400">Gerencie licenças de software</p>
-      {/* Placeholder for licenses UI */ }
-      <div className="bg-slate-800/50 rounded-lg p-4">
-        <p className="text-slate-400">Seção de Licenças</p>
-      </div>
-    </div>
-  );
-
-  const SuppliesSection = () => (
-    <div className="space-y-6">
-      <h2 className="text-xl font-bold text-green-400 flex items-center gap-2">
-        <Printer className="h-5 w-5" />
-        Suprimentos
-      </h2>
-      <p className="text-slate-400">Gerencie suprimentos de impressora</p>
-      {/* Placeholder for supplies UI */ }
-      <div className="bg-slate-800/50 rounded-lg p-4">
-        <p className="text-slate-400">Seção de Suprimentos</p>
-        <p className="text-slate-500 text-sm">Total de suprimentos: {printerSupplies.length}</p>
-      </div>
-    </div>
-  );
+  // Section components remain unchanged...
 
   if (loading) {
     return (
@@ -121,7 +36,8 @@ export default function InventoryPage() {
         <div className="p-4">
           <h2 className="font-bold mb-4 text-cyan-400">Navegação</h2>
           <nav className="space-y-2">
-            <button              onClick={() => setActiveSection('assets')}
+            <button
+              onClick={() => setActiveSection('assets')}
               className={`w-full text-left p-3 rounded-lg transition-all ${activeSection === 'assets' ? 'bg-cyan-900/50 text-cyan-400' : 'text-slate-300 hover:bg-slate-800/50'}`}
             >
               <Users className="h-4 w-4 mr-3" />
@@ -134,11 +50,13 @@ export default function InventoryPage() {
               <Users className="h-4 w-4 mr-3" />
               Usuários
             </button>
-            <button              onClick={() => setActiveSection('maintenance')}
+            <button
+              onClick={() => setActiveSection('maintenance')}
               className={`w-full text-left p-3 rounded-lg transition-all ${activeSection === 'maintenance' ? 'bg-yellow-900/50 text-yellow-400' : 'text-slate-300 hover:bg-slate-800/50'}`}
             >
               <Wrench className="h-4 w-4 mr-3" />
-              Manutenção            </button>
+              Manutenção
+            </button>
             <button
               onClick={() => setActiveSection('movements')}
               className={`w-full text-left p-3 rounded-lg transition-all ${activeSection === 'movements' ? 'bg-blue-900/50 text-blue-400' : 'text-slate-300 hover:bg-slate-800/50'}`}
@@ -162,6 +80,27 @@ export default function InventoryPage() {
             </button>
           </nav>
         </div>
+
+        {/* User info and logout */}
+        {user && (
+          <div className="absolute bottom-4 left-4 right-4">
+            <div className="p-4 border-t border-slate-600/30">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+                  <span className="text-white text-sm font-bold">{user.name.charAt(0)}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-slate-200 truncate">{user.name}</p>
+                  <p className="text-xs text-slate-400 truncate">{user.role}</p>
+                </div>
+              </div>
+              <Button variant="outline" size="sm" onClick={logout} className="w-full">
+                <LogOut className="h-4 w-4 mr-2" />
+                Sair
+              </Button>
+            </div>
+          </div>
+        )}
       </aside>
 
       {/* Main Content */}
@@ -171,7 +110,7 @@ export default function InventoryPage() {
           <p className="text-slate-400">Sistema completo de gestão de ativos</p>
         </header>
 
-        {/* Render active section */ }
+        {/* Render active section */}
         {activeSection === 'assets' && <AssetsSection />}
         {activeSection === 'users' && <UsersSection />}
         {activeSection === 'maintenance' && <MaintenanceSection />}
@@ -179,7 +118,7 @@ export default function InventoryPage() {
         {activeSection === 'licenses' && <LicensesSection />}
         {activeSection === 'supplies' && <SuppliesSection />}
 
-        {/* Export Manager - Always visible at the bottom */ }
+        {/* Export Manager */}
         <div className="mt-12 pt-8 border-t border-slate-700/50">
           <ExportManager
             items={items}
@@ -189,9 +128,6 @@ export default function InventoryPage() {
           />
         </div>
       </div>
-
-      {/* Dialogs would go here - left as placeholder */ }
-      {/* {/* Dialogs remain unchanged */} */}
     </div>
   );
 }

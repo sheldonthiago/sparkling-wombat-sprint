@@ -7,6 +7,7 @@ export interface User {
   matricula?: string;
   phone?: string;
   status: 'active' | 'inactive' | 'suspended';
+  passwordHash?: string;
   lastLogin?: Date;
   createdAt: Date;
   updatedAt: Date;

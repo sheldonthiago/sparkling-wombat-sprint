@@ -42,11 +42,14 @@ import {
   Square,
   Pentagon,
   Octagon,
-  Wrench
+  Wrench,
+  LogIn
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { user, login } = useAuth();
   const { stats, loading } = useSupabaseInventory();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -299,6 +302,14 @@ const Index = () => {
     { name: "Vite", icon: Zap }
   ];
 
+  const handleDashboardClick = () => {
+    if (user) {
+      navigate("/inventory");
+    } else {
+      navigate("/login");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
       {/* Canvas para partículas animadas */}
@@ -351,7 +362,7 @@ const Index = () => {
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
             <Button 
-              onClick={() => navigate("/inventory")}
+              onClick={handleDashboardClick}
               className="group bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 hover:from-cyan-700 hover:via-blue-700 hover:to-purple-700 text-white px-10 py-7 text-xl shadow-2xl shadow-cyan-500/30 border border-cyan-400/30 transition-all duration-300 hover:scale-105 hover:shadow-cyan-500/50 relative overflow-hidden"
               disabled={loading}
             >
@@ -497,7 +508,7 @@ const Index = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
               <Button 
-                onClick={() => navigate("/inventory")}
+                onClick={handleDashboardClick}
                 className="group bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 hover:from-cyan-700 hover:via-blue-700 hover:to-purple-700 text-white px-12 py-8 text-xl shadow-2xl shadow-cyan-500/30 border border-cyan-400/30 transition-all duration-300 hover:scale-105 hover:shadow-cyan-500/50"
               >
                 <Rocket className="h-6 w-6 mr-3 group-hover:animate-pulse" />
