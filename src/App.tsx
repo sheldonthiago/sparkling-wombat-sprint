@@ -6,7 +6,8 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-route
 import Index from "./pages/Index";
 import InventoryPage from "./pages/InventoryPage";
 import UsersPage from "./pages/UsersPage";
-import ReportsPage from "./pages/ReportsPage"; // Import the new ReportsPageimport NotFound from "./pages/NotFound";
+import ReportsPage from "./pages/ReportsPage";
+import NotFound from "./pages/NotFound";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
@@ -62,14 +63,14 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
-            <Route              path="/users"
+            <Route
+              path="/users"
               element={
                 <ProtectedRoute>
                   <UsersPage />
                 </ProtectedRoute>
               }
             />
-            {/* NEW REPORT ROUTE */}
             <Route
               path="/reports"
               element={
@@ -78,7 +79,6 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
