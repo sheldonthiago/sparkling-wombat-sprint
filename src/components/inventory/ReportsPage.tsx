@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { BarChart3, Download, FileText, Calendar, Users, Package, Wrench, TrendingUp } from 'lucide-react';
+import { BarChart3, Download, FileText, Calendar, Users, Package, Wrench, TrendingUp, AlertTriangle, ArrowRightLeft } from 'lucide-react';
 import { useSupabaseInventory } from '@/hooks/use-supabase-inventory';
 import { ExportManager } from '@/components/inventory/ExportManager';
 import { useAuth } from '@/contexts/AuthContext';
