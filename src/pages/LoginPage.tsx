@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { LogIn, AlertCircle } from 'lucide-react';
+import { LogIn, AlertCircle, UserPlus } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -61,6 +61,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="bg-slate-800/50 border-slate-700 text-white"
               />
             </div>
             <div>
@@ -71,12 +72,26 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                className="bg-slate-800/50 border-slate-700 text-white"
               />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700" disabled={loading}>
               {loading ? 'Entrando...' : 'Entrar'}
             </Button>
           </form>
+
+          <div className="text-center pt-4 border-t border-slate-700/50 mt-6">
+            <p className="text-sm text-slate-400">
+              Não tem uma conta?{' '}
+              <button
+                onClick={() => navigate('/register')}
+                className="text-blue-400 hover:text-blue-300 font-medium transition-colors flex items-center gap-1 justify-center mx-auto mt-2"
+              >
+                <UserPlus className="h-4 w-4" />
+                Criar nova conta
+              </button>
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>
