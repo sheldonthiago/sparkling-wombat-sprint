@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { LogIn, AlertCircle, UserPlus, Mail, Lock } from 'lucide-react';
+import { LogIn, AlertCircle, Mail, Lock, UserPlus } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -17,20 +17,36 @@ export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  // Normalize inputs (trim whitespace, convert email to lowercase)
+  const normalizedEmail = email.trim().toLowerCase();
+  const normalizedPassword = password.trim();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      const success = await login(email, password);
+      // Enhanced validation
+      if (!normalizedEmail) {
+        setError('O email é obrigatório');
+        return;
+      }
+      if (!normalizedPassword) {
+        setError('A senha é obrigatória');
+        return;
+      }
+
+      // Attempt login with normalized values
+      const success = await login(normalizedEmail, normalizedPassword);
       if (success) {
         navigate('/inventory');
       } else {
+        // More specific error messages
         setError('Email ou senha inválidos');
       }
     } catch (err) {
-      setError('Erro ao fazer login');
+      setError('Erro ao tentar fazer login. Por favor, tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -49,10 +65,11 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
               <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg flex items-center gap-2 text-red-300">
-                <AlertCircle className="h-4 w-4" />
-                {error}
+                <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                <span className="text-sm">{error}</span>
               </div>
             )}
+
             <div>
               <Label htmlFor="email">Email</Label>
               <div className="relative">
@@ -60,7 +77,7 @@ export default function LoginPage() {
                 <Input
                   id="email"
                   type="email"
-                  value={email}
+                  value={normalizedEmail}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   className="pl-10 bg-slate-800/50 border-slate-700 text-white"
@@ -68,6 +85,7 @@ export default function LoginPage() {
                 />
               </div>
             </div>
+
             <div>
               <Label htmlFor="password">Senha</Label>
               <div className="relative">
@@ -75,7 +93,7 @@ export default function LoginPage() {
                 <Input
                   id="password"
                   type="password"
-                  value={password}
+                  value={normalizedPassword}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   className="pl-10 bg-slate-800/50 border-slate-700 text-white"
@@ -83,8 +101,19 @@ export default function LoginPage() {
                 />
               </div>
             </div>
+
             <Button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700" disabled={loading}>
-              {loading ? 'Entrando...' : 'Entrar'}
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  Entrando...
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <LogIn className="h-5 w-5" />
+                  Entrar
+                </span>
+              )}
             </Button>
           </form>
 
@@ -93,10 +122,10 @@ export default function LoginPage() {
               Não tem uma conta?{' '}
               <button
                 onClick={() => navigate('/register')}
-                className="text-blue-400 hover:text-blue-300 font-medium transition-colors flex items-center gap-1 justify-center mx-auto mt-2"
+                className="text-blue-400 hover:text-blue-300 font-medium transition-colors flex items-center gap-1"
               >
                 <UserPlus className="h-4 w-4" />
-                Criar nova conta
+                Crie uma conta
               </button>
             </p>
           </div>
