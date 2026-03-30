@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from 'react';
 import { User } from '@/types/user';
 import { USER_ROLES } from '@/types/user'; // Added import for USER_ROLES
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,19 +19,18 @@ interface UserManagerProps {
 }
 
 export function UserManager({ users, onAddUser, onUpdateUser, onDeleteUser }: UserManagerProps) {
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [roleFilter, setRoleFilter] = useState<string>('all');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [showAddForm, setShowAddForm] = React.useState(false);
+  const [editingUser, setEditingUser] = React.useState<User | null>(null);
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [roleFilter, setRoleFilter] = React.useState<string>('all');
+  const [statusFilter, setStatusFilter] = React.useState<string>('all');
 
   const filteredUsers = users.filter(user => {
     const matchesSearch = 
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (user.matricula && user.matricula.includes(searchQuery));
-    
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
+        const matchesRole = roleFilter === 'all' || user.role === roleFilter;
     const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
     
     return matchesSearch && matchesRole && matchesStatus;
@@ -170,8 +170,7 @@ export function UserManager({ users, onAddUser, onUpdateUser, onDeleteUser }: Us
       </Card>
 
       {/* User List */}
-      <UserList
-        users={filteredUsers}
+      <UserList        users={filteredUsers}
         onEdit={handleEdit}
         onDelete={onDeleteUser}
       />
