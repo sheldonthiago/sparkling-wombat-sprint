@@ -61,6 +61,7 @@ export function useUsers() {
               updatedAt: new Date(user.updatedAt),
             }));
             setUsers(usersWithDates);
+            console.log('Loaded users from localStorage:', usersWithDates); // Debug log
           } else {
             // Criar usuário admin padrão se não houver dados
             const defaultAdmin: User = {
@@ -76,6 +77,7 @@ export function useUsers() {
             };
             setUsers([defaultAdmin]);
             localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify([defaultAdmin]));
+            console.log('Created default admin user:', defaultAdmin); // Debug log
           }
         }
       } catch (error) {
@@ -100,9 +102,9 @@ export function useUsers() {
     loadUsers();
   }, [useSupabase]);
 
-  // Salvar usuários
+  // Salvar usuários sempre que mudar
   useEffect(() => {
-    const saveUsers = async () => {
+    const saveUsers = () => {
       try {
         if (useSupabase && supabase) {
           // Salvar no Supabase (implementar lógica de upsert)
@@ -110,6 +112,7 @@ export function useUsers() {
         } else {
           // Salvar no localStorage
           localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+          console.log('Saved users to localStorage:', users); // Debug log
         }
       } catch (error) {
         console.error('Error saving users:', error);
@@ -129,7 +132,10 @@ export function useUsers() {
       updatedAt: new Date(),
     };
     
-    setUsers(prev => [...prev, newUser]);
+    const updatedUsers = [...users, newUser];
+    setUsers(updatedUsers);
+    console.log('Added new user:', newUser); // Debug log
+    console.log('Updated users list:', updatedUsers); // Debug log
   };
 
   const updateUser = (id: string, updates: Partial<User>) => {

@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { UserPlus, AlertCircle, Mail, Lock, User, Phone, Hash, Building, CheckCircle } from 'lucide-react';
+import { UserPlus, AlertCircle, Mail, Lock, User, Phone, Hash, Building, CheckCircle, Shield } from 'lucide-react';
+import { USER_ROLES } from '@/types/user';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -19,6 +20,7 @@ export default function RegisterPage() {
     department: '',
     matricula: '',
     phone: '',
+    role: 'viewer' as 'admin' | 'manager' | 'technician' | 'viewer',
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -26,7 +28,7 @@ export default function RegisterPage() {
   const { addUser, getUserByEmail } = useUsers();
   const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
@@ -78,16 +80,20 @@ export default function RegisterPage() {
       const passwordHash = await hashPassword(formData.password);
 
       // Adicionar novo usuário
-      addUser({
+      const newUser = {
         name: formData.name.trim(),
         email: formData.email.trim().toLowerCase(),
-        role: 'viewer', // Usuários registrados automaticamente têm perfil de visualizador
+        role: formData.role,
         department: formData.department,
         matricula: formData.matricula || undefined,
         phone: formData.phone || undefined,
-        status: 'active',
+        status: 'active' as const,
         passwordHash,
-      });
+      };
+
+      console.log('Creating user:', newUser); // Debug log
+      
+      addUser(newUser);
 
       // Mostrar sucesso e redirecionar para login
       setSuccess(true);
@@ -184,6 +190,27 @@ export default function RegisterPage() {
                   placeholder="joao@empresa.com"
                   required
                 />
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="role" className="text-slate-300">Perfil de Acesso</Label>
+              <div className="relative">
+                <Shield className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <select
+                  id="role"
+                  name="role"
+                  value={formData.role}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-4 py-2 bg-slate-800/50 border border-slate-700 rounded-md text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                >
+                  {USER_ROLES.map((role) => (
+                    <option key={role.value} value={role.value} className="bg-slate-800">
+                      {role.label} - {role.description}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -310,7 +337,6 @@ export default function RegisterPage() {
 
             <div className="text-xs text-slate-500 text-center pt-2">
               <p>Ao criar uma conta, você concorda com os termos de uso.</p>
-              <p>Usuários registrados têm perfil de "Visualizador" por padrão.</p>
             </div>
           </form>
         </CardContent>
