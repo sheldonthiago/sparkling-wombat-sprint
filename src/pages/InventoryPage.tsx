@@ -54,7 +54,8 @@ export default function InventoryPage() {
   const [editingSupply, setEditingSupply] = useState(null);
   const [selectedItemForQR, setSelectedItemForQR] = useState(null);
 
-  // Handle item form submission  const handleItemSubmit = (data) => {
+  // Handle item form submission
+  const handleItemSubmit = (data) => {
     if (editingItem) {
       updateItem(editingItem.id, data);
     } else {
@@ -81,7 +82,8 @@ export default function InventoryPage() {
     setEditingMaintenance(null);
   };
 
-  // Handle license form submission  const handleLicenseSubmit = (data) => {
+  // Handle license form submission
+  const handleLicenseSubmit = (data) => {
     if (editingLicense) {
       updateSoftwareLicense(editingLicense.id, data);
     } else {
@@ -108,8 +110,6 @@ export default function InventoryPage() {
     setShowAddMovementForm(false);
   };
 
-  // FIX: Removed extra closing brace that was causing syntax error  // The previous code had an extra "}" here that broke JSX parsing
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
@@ -135,7 +135,8 @@ export default function InventoryPage() {
               <Users className="h-4 w-4 mr-3" />
               Ativos
             </button>
-            <button              onClick={() => setActiveSection('users')}
+            <button
+              onClick={() => setActiveSection('users')}
               className={`w-full text-left p-3 rounded-lg transition-all ${activeSection === 'users' ? 'bg-blue-900/50 text-blue-400' : 'text-slate-300 hover:bg-slate-800/50'}`}
             >
               <Users className="h-4 w-4 mr-3" />
@@ -212,12 +213,14 @@ export default function InventoryPage() {
                   Adicionar Item
                 </Button>
                 
-                <Button                   onClick={() => {}} 
+                <Button
+                  onClick={() => {}}
                   variant="outline"
                   disabled={!selectedItemForQR}
                 >
                   <QrCode className="h-4 w-4 mr-2" />
-                  QR Code                </Button>
+                  QR Code
+                </Button>
                 
                 <Dialog 
                   open={selectedItemForQR !== null} 
@@ -232,7 +235,9 @@ export default function InventoryPage() {
                     </DialogHeader>
                     {selectedItemForQR && (
                       <QRCodeGenerator 
-                        itemId={selectedItemForQR.id}                         itemName={selectedItemForQR.name}                       />
+                        itemId={selectedItemForQR.id}
+                        itemName={selectedItemForQR.name}
+                      />
                     )}
                   </DialogContent>
                 </Dialog>
@@ -250,7 +255,8 @@ export default function InventoryPage() {
                       {editingItem ? 'Editar Item' : 'Adicionar Novo Item'}
                     </DialogTitle>
                   </DialogHeader>
-                  <InventoryForm                     onSubmit={handleItemSubmit}
+                  <InventoryForm 
+                    onSubmit={handleItemSubmit}
                     onCancel={() => setShowAddItemForm(false)}
                     initialData={editingItem}
                   />
@@ -279,7 +285,8 @@ export default function InventoryPage() {
             onAddUser={handleUserSubmit}
             onUpdateUser={handleUserSubmit}
             onDeleteUser={(id) => {
-              // Would call deleteUser from hook            }}
+              // Would call deleteUser from hook
+            }}
           />
         )}
 
@@ -289,7 +296,8 @@ export default function InventoryPage() {
               <h3 className="text-lg font-semibold">Manutenções</h3>
               <Button onClick={() => { setEditingMaintenance(null); setShowAddMaintenanceForm(true); }}>
                 <Plus className="h-4 w-4 mr-2" />
-                Adicionar Manutenção              </Button>
+                Adicionar Manutenção
+              </Button>
             </div>
 
             {showAddMaintenanceForm && (
@@ -379,7 +387,8 @@ export default function InventoryPage() {
                     </DialogTitle>
                   </DialogHeader>
                   <SoftwareLicenseManager 
-                    licenses={[]} // Would come from hook                    onAddLicense={addSoftwareLicense}
+                    licenses={[]} // Would come from hook
+                    onAddLicense={addSoftwareLicense}
                     onUpdateLicense={updateSoftwareLicense}
                   />
                 </DialogContent>
@@ -387,7 +396,8 @@ export default function InventoryPage() {
             )}
 
             <SoftwareLicenseManager 
-              licenses={[]} // Would come from hook              onAddLicense={addSoftwareLicense}
+              licenses={[]} // Would come from hook
+              onAddLicense={addSoftwareLicense}
               onUpdateLicense={updateSoftwareLicense}
             />
           </div>
@@ -435,7 +445,8 @@ export default function InventoryPage() {
 
         {/* Export Manager */}
         <div className="mt-12 pt-8 border-t border-slate-700/50">
-          <ExportManager            items={items}
+          <ExportManager 
+            items={items}
             movements={movements}
             supplies={printerSupplies}
             maintenances={maintenances}
