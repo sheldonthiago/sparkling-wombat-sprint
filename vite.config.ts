@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react-swc';
 import path from 'path';
 
 export default defineConfig(() => ({
-  base: '/techasset-pro/', // Mude para o nome do seu repositório
+  base: '/sparkling-wombat-sprint/', // Nome do seu repositório
   plugins: [react()],
   resolve: {
     alias: {
