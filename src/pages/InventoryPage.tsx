@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useSupabaseInventory } from '@/hooks/use-supabase-inventory';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, Users, Wrench, ArrowRightLeft, BookOpen, Printer, LogOut, Plus, QrCode } from 'lucide-react';
+import { ChevronRight, Users, Wrench, ArrowRightLeft, BookOpen, Printer, LogOut, Plus, QrCode, BarChart3 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 // Import the actual components we need
@@ -169,6 +169,13 @@ export default function InventoryPage() {
             >
               <Printer className="h-4 w-4 mr-3" />
               Suprimentos
+            </button>
+            <button
+              onClick={() => window.location.href = '/reports'}
+              className={`w-full text-left p-3 rounded-lg transition-all ${activeSection === 'reports' ? 'bg-indigo-900/50 text-indigo-400' : 'text-slate-300 hover:bg-slate-800/50'}`}
+            >
+              <BarChart3 className="h-4 w-4 mr-3" />
+              Relatórios
             </button>
           </nav>
         </div>
