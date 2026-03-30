@@ -25,6 +25,13 @@ export function UserManager({ users, onAddUser, onUpdateUser, onDeleteUser }: Us
   const [roleFilter, setRoleFilter] = React.useState<string>('all');
   const [statusFilter, setStatusFilter] = React.useState<string>('all');
 
+  // Add resetForm function to clear filter states
+  const resetForm = () => {
+    setSearchQuery('');
+    setRoleFilter('all');
+    setStatusFilter('all');
+  };
+
   const filteredUsers = users.filter(user => {
     const matchesSearch = 
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
