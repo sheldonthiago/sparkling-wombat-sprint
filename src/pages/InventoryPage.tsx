@@ -2,8 +2,19 @@ import { useState } from 'react';
 import { useSupabaseInventory } from '@/hooks/use-supabase-inventory';
 import { ExportManager } from '@/components/inventory/ExportManager';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, Users, Wrench, ArrowRightLeft, BookOpen, Printer, LogOut } from 'lucide-react';
+import { ChevronRight, Users, Wrench, ArrowRightLeft, BookOpen, Printer, LogOut, Plus, QrCode } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+
+// Import the actual components we need
+import { InventoryList } from '@/components/inventory/InventoryList';
+import { InventoryForm } from '@/components/inventory/InventoryForm';
+import { QRCodeGenerator } from '@/components/inventory/QRCodeGenerator';
+import { UserManager } from '@/components/users/UserManager';
+import { MaintenanceManager } from '@/components/inventory/MaintenanceManager';
+import { MovementManager } from '@/components/inventory/MovementManager';
+import { SoftwareLicenseManager } from '@/components/inventory/SoftwareLicenseManager';
+import { PrinterSupplyManager } from '@/components/inventory/PrinterSupplyManager';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 export default function InventoryPage() {
   const {
@@ -11,12 +22,91 @@ export default function InventoryPage() {
     movements,
     printerSupplies,
     maintenances,
-    loading
+    loading,
+    addItem,
+    updateItem,
+    deleteItem,
+    addMovement,
+    allocateItem,
+    returnItem,
+    addMaintenance,
+    updateMaintenance,
+    addSoftwareLicense,
+    updateSoftwareLicense,
+    addPrinterSupply,
+    updatePrinterSupply,
+    removePrinterSupply
   } = useSupabaseInventory();
   const { user, logout } = useAuth();
   const [activeSection, setActiveSection] = useState('assets');
+  const [showAddItemForm, setShowAddItemForm] = useState(false);
+  const [showAddUserForm, setShowAddUserForm] = useState(false);
+  const [showAddMaintenanceForm, setShowAddMaintenanceForm] = useState(false);
+  const [showAddMovementForm, setShowAddMovementForm] = useState(false);
+  const [showAddLicenseForm, setShowAddLicenseForm] = useState(false);
+  const [showAddSupplyForm, setShowAddSupplyForm] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+  const [editingUser, setEditingUser] = useState(null);
+  const [editingMaintenance, setEditingMaintenance] = useState(null);
+  const [editingLicense, setEditingLicense] = useState(null);
+  const [editingSupply, setEditingSupply] = useState(null);
+  const [selectedItemForQR, setSelectedItemForQR] = useState(null);
 
-  // Section components remain unchanged...
+  // Handle item form submission
+  const handleItemSubmit = (data) => {
+    if (editingItem) {
+      updateItem(editingItem.id, data);
+    } else {
+      addItem(data);
+    }
+    setShowAddItemForm(false);
+    setEditingItem(null);
+  };
+
+  // Handle user form submission (simplified - would use useUsers hook in reality)
+  const handleUserSubmit = (data) => {
+    setShowAddUserForm(false);
+    setEditingUser(null);
+  };
+
+  // Handle maintenance form submission
+  const handleMaintenanceSubmit = (data) => {
+    if (editingMaintenance) {
+      updateMaintenance(editingMaintenance.id, data);
+    } else {
+      addMaintenance(data);
+    }
+    setShowAddMaintenanceForm(false);
+    setEditingMaintenance(null);
+  };
+
+  // Handle license form submission
+  const handleLicenseSubmit = (data) => {
+    if (editingLicense) {
+      updateSoftwareLicense(editingLicense.id, data);
+    } else {
+      addSoftwareLicense(data);
+    }
+    setShowAddLicenseForm(false);
+    setEditingLicense(null);
+  };
+
+  // Handle supply form submission
+  const handleSupplySubmit = (data) => {
+    if (editingSupply) {
+      updatePrinterSupply(editingSupply.id, data);
+    } else {
+      addPrinterSupply(data);
+    }
+    setShowAddSupplyForm(false);
+    setEditingSupply(null);
+  };
+
+  // Handle movement form submission
+  const handleMovementSubmit = (data) => {
+    addMovement(data);
+    setShowAddMovementForm(false);
+  };
 
   if (loading) {
     return (
@@ -43,8 +133,7 @@ export default function InventoryPage() {
               <Users className="h-4 w-4 mr-3" />
               Ativos
             </button>
-            <button
-              onClick={() => setActiveSection('users')}
+            <button              onClick={() => setActiveSection('users')}
               className={`w-full text-left p-3 rounded-lg transition-all ${activeSection === 'users' ? 'bg-blue-900/50 text-blue-400' : 'text-slate-300 hover:bg-slate-800/50'}`}
             >
               <Users className="h-4 w-4 mr-3" />
@@ -111,12 +200,240 @@ export default function InventoryPage() {
         </header>
 
         {/* Render active section */}
-        {activeSection === 'assets' && <AssetsSection />}
-        {activeSection === 'users' && <UsersSection />}
-        {activeSection === 'maintenance' && <MaintenanceSection />}
-        {activeSection === 'movements' && <MovementsSection />}
-        {activeSection === 'licenses' && <LicensesSection />}
-        {activeSection === 'supplies' && <SuppliesSection />}
+        {activeSection === 'assets' && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold">Ativos de TI</h3>
+              <div className="flex gap-2">
+                <Button onClick={() => { setEditingItem(null); setShowAddItemForm(true); }}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Adicionar Item
+                </Button>
+                
+                <Button                   onClick={() => {}} 
+                  variant="outline"
+                  disabled={!selectedItemForQR}
+                >
+                  <QrCode className="h-4 w-4 mr-2" />
+                  QR Code
+                </Button>
+                
+                <Dialog 
+                  open={selectedItemForQR !== null} 
+                  onOpenChange={() => setSelectedItemForQR(null)}
+                >
+                  <DialogTrigger asChild>
+                    <div className="hidden" />
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Gerar QR Code</DialogTitle>
+                    </DialogHeader>
+                    {selectedItemForQR && (
+                      <QRCodeGenerator 
+                        itemId={selectedItemForQR.id} 
+                        itemName={selectedItemForQR.name}                       />
+                    )}
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
+
+            {showAddItemForm && (
+              <Dialog open={showAddItemForm} onOpenChange={() => setShowAddItemForm(false)}>
+                <DialogTrigger asChild>
+                  <div className="hidden" />
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>
+                      {editingItem ? 'Editar Item' : 'Adicionar Novo Item'}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <InventoryForm 
+                    onSubmit={handleItemSubmit}
+                    onCancel={() => setShowAddItemForm(false)}
+                    initialData={editingItem}
+                  />
+                </DialogContent>
+              </Dialog>
+            )}
+
+            <InventoryList 
+              items={items}
+              onEdit={(item) => { setEditingItem(item); setShowAddItemForm(true); }}
+              onDelete={deleteItem}
+              onAllocate={allocateItem}
+              onReturn={returnItem}
+              onMaintenance={(itemId) => {
+                // Navigate to maintenance section or open maintenance form for this item
+                setActiveSection('maintenance');
+                // In a real app, we might pre-fill the maintenance form with this item
+              }}
+            />
+          </div>
+        )}
+
+        {activeSection === 'users' && (
+          <UserManager 
+            users={[]} // Would come from useUsers hook
+            onAddUser={handleUserSubmit}
+            onUpdateUser={handleUserSubmit}
+            onDeleteUser={(id) => {
+              // Would call deleteUser from hook            }}
+          />
+        )}
+
+        {activeSection === 'maintenance' && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold">Manutenções</h3>
+              <Button onClick={() => { setEditingMaintenance(null); setShowAddMaintenanceForm(true); }}>
+                <Plus className="h-4 w-4 mr-2" />
+                Adicionar Manutenção
+              </Button>
+            </div>
+
+            {showAddMaintenanceForm && (
+              <Dialog open={showAddMaintenanceForm} onOpenChange={() => setShowAddMaintenanceForm(false)}>
+                <DialogTrigger asChild>
+                  <div className="hidden" />
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>
+                      {editingMaintenance ? 'Editar Manutenção' : 'Adicionar Nova Manutenção'}
+                    </DialogTitle>
+                  </DialogHeader>
+                  {/* In a real app, we would have a maintenance form component here */}
+                  <div className="p-6">
+                    <p className="text-slate-500">Formulário de manutenção em desenvolvimento...</p>
+                    {/* This would be replaced with an actual MaintenanceForm component */}
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
+
+            <MaintenanceManager 
+              maintenances={maintenances}
+              items={items}
+              onAddMaintenance={addMaintenance}
+              onUpdateMaintenance={updateMaintenance}
+            />
+          </div>
+        )}
+
+        {activeSection === 'movements' && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold">Movimentações</h3>
+              <Button onClick={() => { setShowAddMovementForm(true); }}>
+                <Plus className="h-4 w-4 mr-2" />
+                Registrar Movimentação
+              </Button>
+            </div>
+
+            {showAddMovementForm && (
+              <Dialog open={showAddMovementForm} onOpenChange={() => setShowAddMovementForm(false)}>
+                <DialogTrigger asChild>
+                  <div className="hidden" />
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>Registrar Nova Movimentação</DialogTitle>
+                  </DialogHeader>
+                  {/* In a real app, we would have a movement form component here */}
+                  <div className="p-6">
+                    <p className="text-slate-500">Formulário de movimentação em desenvolvimento...</p>
+                    {/* This would be replaced with an actual MovementForm component */}
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
+
+            <MovementManager 
+              movements={movements}
+              items={items}
+              onAddMovement={addMovement}
+            />
+          </div>
+        )}
+
+        {activeSection === 'licenses' && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold">Licenças de Software</h3>
+              <Button onClick={() => { setEditingLicense(null); setShowAddLicenseForm(true); }}>
+                <Plus className="h-4 w-4 mr-2" />
+                Adicionar Licença
+              </Button>
+            </div>
+
+            {showAddLicenseForm && (
+              <Dialog open={showAddLicenseForm} onOpenChange={() => setShowAddLicenseForm(false)}>
+                <DialogTrigger asChild>
+                  <div className="hidden" />
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>
+                      {editingLicense ? 'Editar Licença' : 'Adicionar Nova Licença'}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <SoftwareLicenseManager 
+                    licenses={[]} // Would come from hook                    onAddLicense={addSoftwareLicense}
+                    onUpdateLicense={updateSoftwareLicense}
+                  />
+                </DialogContent>
+              </Dialog>
+            )}
+
+            <SoftwareLicenseManager 
+              licenses={[]} // Would come from hook              onAddLicense={addSoftwareLicense}
+              onUpdateLicense={updateSoftwareLicense}
+            />
+          </div>
+        )}
+
+        {activeSection === 'supplies' && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold">Suprimentos de Impressora</h3>
+              <Button onClick={() => { setEditingSupply(null); setShowAddSupplyForm(true); }}>
+                <Plus className="h-4 w-4 mr-2" />
+                Adicionar Suprimento
+              </Button>
+            </div>
+
+            {showAddSupplyForm && (
+              <Dialog open={showAddSupplyForm} onOpenChange={() => setShowAddSupplyForm(false)}>
+                <DialogTrigger asChild>
+                  <div className="hidden" />
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>
+                      {editingSupply ? 'Editar Suprimento' : 'Adicionar Novo Suprimento'}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <PrinterSupplyManager 
+                    supplies={printerSupplies}
+                    onAddSupply={addPrinterSupply}
+                    onUpdateSupply={updatePrinterSupply}
+                    onRemoveSupply={removePrinterSupply}
+                  />
+                </DialogContent>
+              </Dialog>
+            )}
+
+            <PrinterSupplyManager 
+              supplies={printerSupplies}
+              onAddSupply={addPrinterSupply}
+              onUpdateSupply={updatePrinterSupply}
+              onRemoveSupply={removePrinterSupply}
+            />
+          </div>
+        )}
 
         {/* Export Manager */}
         <div className="mt-12 pt-8 border-t border-slate-700/50">
