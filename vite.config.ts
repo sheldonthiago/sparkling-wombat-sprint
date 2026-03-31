@@ -5,9 +5,9 @@ import path from "path";
 
 export default defineConfig(() => ({
   server: {
-    host: "0.0.0.0", // Permite acesso externo na rede local
+    host: "0.0.0.0",
     port: 8080,
-    allowedHosts: true, // Permite hosts externos (opcional, para produção)
+    allowedHosts: true,
   },
   plugins: [dyadComponentTagger(), react()],
   resolve: {
@@ -15,4 +15,5 @@ export default defineConfig(() => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  base: "/sparkling-wombat-sprint/", // IMPORTANTE: nome do seu repositório no GitHub
 }));

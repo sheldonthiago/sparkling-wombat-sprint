@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TechAsset Pro</title>
+    <script>
+      // Redireciona para index.html mantendo a URL
+      const redirect = () => {
+        const path = window.location.pathname.replace(/^\/sparkling-wombat-sprint/, '');
+        if (path && path !== '/') {
+          window.history.replaceState({}, document.title, '/sparkling-wombat-sprint/');
+        }
+      };
+      redirect();
+    </script>
+  </head>
+  <body>
+    <script type="module" src="/sparkling-wombat-sprint/index.js"></script>
+  </body>
+</html>
